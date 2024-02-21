@@ -39,7 +39,6 @@ const styles = StyleSheet.create({
         padding: 0,
         borderRadius: 10,
         borderWidth: 1,
-        borderStyle: 'dashed',
         borderColor: '#000',
         position: 'absolute',
     },
