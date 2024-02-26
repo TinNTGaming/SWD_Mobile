@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomePage from './app/screens/HomePage';
 import LoginMember from './app/screens/LoginMember';
 import RegisterMember from './app/screens/RegisterMember';
+import HeaderMember from './app/components/HeaderMember';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ export default function App() {
         <Stack.Screen name='HomePage' component={HomePage} />
         <Stack.Screen name='LoginMember' component={LoginMember} />
         <Stack.Screen name='RegisterMember' component={RegisterMember} />
+        <Stack.Screen name='HeaderMember' component={HeaderMember} />
       </Stack.Navigator>
     </NavigationContainer>
   );

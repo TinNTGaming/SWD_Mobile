@@ -1,9 +1,36 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import _ from "lodash";
+import { handleLoginMember } from "../../services/memberService";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginMember = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState(''); 
+
+  const doLogin = async() => {
+    if (username.length == 0){
+      alert('Username is required'); 
+      return;
+    }
+    if (password.length == 0){
+      alert('Password is required');
+      return;
+    }
+    
+    try {
+      let data = await handleLoginMember(username, password);
+      console.log(data);
+      if (data && !_.isEmpty(data.token)) {
+          await AsyncStorage.setItem('token', data.token);
+          await AsyncStorage.setItem('userInfo', JSON.stringify(data.user));
+          navigation.navigate('HeaderMember');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('An error occurred during login.');
+    }
+  };
 
   return (
     <View style={styles.loginBackground}>
@@ -28,7 +55,7 @@ const LoginMember = ({navigation}) => {
             />
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.btnLogin}>
+            <TouchableOpacity style={styles.btnLogin} onPress={doLogin}>
               <Text style={styles.btnText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('RegisterMember')}>
