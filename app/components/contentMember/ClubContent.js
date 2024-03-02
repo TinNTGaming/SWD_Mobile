@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView} from "react-native";
 import { getAllClub } from "../../../services/userService";
+import { useNavigation } from '@react-navigation/native';
 
 function ClubContent() {
   const [clubs, setClubs] = useState([]);
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchApiClubs();
@@ -20,14 +22,51 @@ function ClubContent() {
   };
 
   const handleClick = (clubId) => {
-    navigation.navigate("MemberSport", { clubId });
+    navigate("ClubPage", { clubId });
   };
 
   return (
     <View style={styles.containerClub1}>
       <View style={styles.line}></View>
       <Text style={styles.clubTitle}>Sport clubs</Text>
+      <ScrollView horizontal={true}>
       <View style={styles.contentMiddle}>
+            <TouchableOpacity
+                  style={styles.club}
+                 onPress={()=> navigation.navigate("ClubPage")}                
+                >
+                  <Image
+                    style={styles.imageClub}
+                    source={require("../../assets/Sport/badminton.jpg")}
+                  />
+                  <Text style={styles.clubName} >
+                    Club Name: Test 1
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.club}
+                 
+                >
+                  <Image
+                    style={styles.imageClub}
+                    source={require("../../assets/Sport/badminton.jpg")}
+                  />
+                  <Text style={styles.clubName} >
+                    Club Name: Test 2
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.club}
+                 
+                >
+                  <Image
+                    style={styles.imageClub}
+                    source={require("../../assets/Sport/badminton.jpg")}
+                  />
+                  <Text style={styles.clubName} >
+                    Club Name: Test 3
+                  </Text>
+                </TouchableOpacity>
         {clubs &&
           clubs.map((item, index) => {
             if (item.status && item.status.data && item.status.data[0] === 1) {
@@ -49,6 +88,7 @@ function ClubContent() {
             }
           })}
       </View>
+      </ScrollView>
     </View>
   );
 }
@@ -62,26 +102,28 @@ const styles = StyleSheet.create({
     height: 1,
     width: "80%",
     backgroundColor: "#000",
-    margin: 100,
+    margin: 5,
     alignSelf: "center",
   },
   clubTitle: {
     color: "#000",
-    marginTop: 80,
+    marginTop: 5,
     textAlign: "center",
+    fontSize: 30
   },
   contentMiddle: {
-    height: "auto",
-    marginTop: 50,
+    marginTop: 30,
+    flexDirection: 'row',
+    padding: 10,
+    gap: 10
   },
   imageClub: {
-    borderRadius: 10,
-    height: 250,
-    width: 350,
+    height: 100,
+    width: 150,
     marginBottom: 20,
   },
   club: {
-    height: "auto",
+    height: 170,
     flexDirection: "column",
     textAlign: "center",
     borderColor: "#000",
@@ -90,7 +132,7 @@ const styles = StyleSheet.create({
   },
   clubName: {
     fontWeight: "bold",
-    fontSize: 18,
+    fontSize: 16,
     textDecorationLine: "none",
   },
 });

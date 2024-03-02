@@ -6,6 +6,7 @@ import HomePage from './app/screens/HomePage';
 import LoginMember from './app/screens/LoginMember';
 import RegisterMember from './app/screens/RegisterMember';
 import MemberPage from './app/screens/MemberPage';
+import ClubPage from './app/screens/ClubPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ export default function App() {
         <Stack.Screen name='LoginMember' component={LoginMember} />
         <Stack.Screen name='RegisterMember' component={RegisterMember} />
         <Stack.Screen name='MemberPage' component={MemberPage} />
+        <Stack.Screen name='ClubPage' component={ClubPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
