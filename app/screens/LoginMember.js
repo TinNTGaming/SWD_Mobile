@@ -55,7 +55,7 @@ const LoginMember = ({navigation}) => {
             />
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.btnLogin} onPress={doLogin}>
+            <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('MemberPage')}>
               <Text style={styles.btnText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('RegisterMember')}>

@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 //import { handleLogoutMember } from '../../services/memberService';
 import HomeContent from './contentMember/HomeContent';
 import ClubContent from './contentMember/ClubContent';
+import Contact from '../components/FooterMember';
 
 function HeaderMember() {
 
@@ -29,47 +30,62 @@ function HeaderMember() {
   const userInfo = { name: 'John Doe', image: '' };
 
   return (
-    <View style={styles.body}>
-      <Image style={styles.headerLogo} source={require('../assets/logoHeader/logo.png')}/>
-      <View style={styles.middle}>
-        <View style={styles.contentMiddle}>
-          <TouchableOpacity
-            style={[styles.childContent, activeTab === 'home' && styles.active]}
-            onPress={() => handleTabClick('home')}
-          >
-            <Text style={styles.active}>
-              <Text style={{ fontWeight: 'bold' }}>Home</Text>
+    <View style={styles.container}>
+        <View style={styles.header}>
+        <Image style={styles.headerLogo} source={require('../assets/logoHeader/logo.png')}/>
+        <View style={styles.middle}>
+          <View style={styles.contentMiddle}>
+            <TouchableOpacity
+              style={[styles.childContent, activeTab === 'home' && styles.active]}
+              onPress={() => handleTabClick('home')}
+            >
+              <Text style={styles.active}>
+                <Text style={{ fontWeight: 'bold' }}>Home</Text>
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.childContent, activeTab === 'club' && styles.active]}
+              onPress={() => handleTabClick('club')}
+            >
+              <Text style={styles.active}>
+                <Text style={{ fontWeight: 'bold' }}>Club</Text>
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.childContent}>
+              <TouchableOpacity
+                style={[styles.childContent, activeTab === 'contact' && styles.active]}
+                onPress={() => handleTabClick('contact')}
+              >
+                <Text style={styles.active}>
+                  <Text style={{ fontWeight: 'bold' }}>Contact</Text>
+                </Text>
+              </TouchableOpacity>
+            </View>          
+          </View>
+        </View>
+        <View style={styles.contentRight}>
+          <View style={styles.headerUserInfo}>
+            <Text style={{ fontSize: 13, fontWeight: '300', textTransform: 'uppercase' }}>
+              {userInfo.name}
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.childContent, activeTab === 'club' && styles.active]}
-            onPress={() => handleTabClick('club')}
-          >
-            <Text style={styles.active}>
-              <Text style={{ fontWeight: 'bold' }}>Club</Text>
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.childContent}>
-            <Text style={styles.active}>
-              <Text style={{ fontWeight: 'bold' }}>Contact</Text>
-            </Text>
-          </View>          
+          </View>
         </View>
       </View>
-      <View style={styles.contentRight}>
-        <View style={styles.headerUserInfo}>
-          <Text style={{ fontSize: 13, fontWeight: '300', textTransform: 'uppercase' }}>
-            {userInfo.name}
-          </Text>
-        </View>
+      <View style={styles.content}>
+        {activeTab === 'home' && <HomeContent />}
+        {activeTab === 'club' && <ClubContent />}
+        {activeTab === 'contact' && <Contact />}
       </View>
-      {activeTab === 'home' && <HomeContent />}
-      {activeTab === 'club' && <ClubContent />}
     </View>
+    
   );
 };
 const styles = StyleSheet.create({
-    body: {
+    container: {
+    flex: 1,
+    flexDirection: 'column',
+    },
+    header: {
       flexDirection: 'row',
       height: 70,
       position: 'absolute',
@@ -119,5 +135,9 @@ const styles = StyleSheet.create({
       fontWeight: '10',
       textTransform: 'uppercase',
     },
+    content:{
+      flex: 1,
+      marginTop: 70
+    }
   });
 export default HeaderMember;

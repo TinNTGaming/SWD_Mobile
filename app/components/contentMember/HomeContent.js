@@ -64,17 +64,17 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   content1: {
-    fontSize: 18,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   content2: {
-    fontSize: 14,
+    fontSize: 20,
   },
   imgClub: {
     marginBottom: 20,
   },
   joinTitle: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 10,
   },
