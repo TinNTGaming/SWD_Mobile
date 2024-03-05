@@ -24,7 +24,7 @@ const LoginMember = ({navigation}) => {
       if (data && !_.isEmpty(data.token)) {
           await AsyncStorage.setItem('token', data.token);
           await AsyncStorage.setItem('userInfo', JSON.stringify(data.user));
-          navigation.navigate('HeaderMember');
+          navigation.navigate('MemberPage');
       }
     } catch (error) {
       console.error(error);
@@ -55,7 +55,7 @@ const LoginMember = ({navigation}) => {
             />
           </View>
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('MemberPage')}>
+            <TouchableOpacity style={styles.btnLogin} onPress={doLogin}>
               <Text style={styles.btnText}>Login</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('RegisterMember')}>

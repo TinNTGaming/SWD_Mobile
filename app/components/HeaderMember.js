@@ -1,10 +1,11 @@
-import React from 'react';
+import React,  { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 //import { handleLogoutMember } from '../../services/memberService';
 import HomeContent from './contentMember/HomeContent';
 import ClubContent from './contentMember/ClubContent';
 import Contact from '../components/FooterMember';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function HeaderMember() {
 
@@ -26,8 +27,17 @@ function HeaderMember() {
     setActiveTab(tab);
   };
 
-  // Mocked user data for testing
-  const userInfo = { name: 'John Doe', image: '' };
+  const getLoginInfo = async()=>{
+       try {
+           const value = await AsyncStorage.getItem('userInfo')
+           if(value !== null) {
+               userInfo =  JSON.parse (value);
+           }
+         } catch(e) {
+           console.log(e);
+         }
+   };
+   getLoginInfo();
 
   return (
     <View style={styles.container}>
@@ -95,6 +105,7 @@ const styles = StyleSheet.create({
       zIndex: 1000,
       backgroundColor: '#fff',
       alignItems: 'center',
+      paddingTop: 30,
     },
     headerLogo: {
       height: '50%',

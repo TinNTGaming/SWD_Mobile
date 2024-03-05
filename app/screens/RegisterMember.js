@@ -1,31 +1,129 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { getAllBuildingId } from "../../services/userService";
+import { registerMember } from "../../services/memberService";
 import * as ImagePicker from 'react-native-image-picker';
 
 const RegisterMember = ({navigation}) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [image, setImage] = useState(null);
-  const [gender, setGender] = useState('');
-  const [buildingname, setBuildingname] = useState('');
-  const [buildingid, setBuildingid] = useState('');
-  const [phonenumber, setPhonenumber] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    image: '',
+    gender: '',
+    buildingId: '',
+    buildingName: '',
+    phoneNumber: ''
+  });
+  const [buildingIds, setBuildingIds] = useState([]);
 
-  const handleImagePick = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: 'mix',
-        allowEditing: true,
-        aspect: [4, 3],
-        quality: 1,
+  useEffect(() => {
+    const fetchBuildingIds = async () => {
+        try {
+            const response = await getAllBuildingId();
+            console.log(response);
+            setBuildingIds(response.result);
+        } catch (error) {
+            console.error('Error fetching buildingIds', error);
+        }
+    };
+
+    fetchBuildingIds();
+  }, []);
+
+
+  const handleOnChangeInput = (event, id) => {
+    if(id === 'image' && imageFile){
+        uploadCloudinary(imageFile.current?.files[0])
+    }
+    setFormData({
+        ...formData,
+        [id]: event.target.value,
     });
+  };
 
-    if (!result.cancelled){
-        setImage(result.uri);
+  const uploadCloudinary = async (image) => {
+    const formDataImage = new FormData();
+    formDataImage.append('api_key', '665652388645534');
+    formDataImage.append('upload_preset','upload-image');
+    formDataImage.append('file', image);
+    try {
+      const response = await axios.post('https://api.cloudinary.com/v1_1/upload-image/image/upload',formDataImage);
+      setTimeout(()=> {
+        setFormData({
+            ...formData,
+            image: response.data.url
+        })
+      },500)
+      console.log('Upload cloudinary successfully', response);
+    } catch (error) {
+      console.log('Error upload cloudinary:', error);
     }
   };
 
+  const checkValidateInput = () => {
+    let isValid = true;
+    let arrInput = ['name', 'email', 'password', 'image', 'gender', 'buildingId', 'buildingName', 'phoneNumber'];
+    for (let i = 0; i < arrInput.length; i++) {
+        if (!formData[arrInput[i]]) {
+            isValid = false;
+            showErrorToast(`Missing parameter: ${arrInput[i]}`);
+            break;
+        }
+    }
+    return isValid;
+  };
+
+  const handleAddNewUser =  async() => {
+    let isValid = checkValidateInput();
+    if (isValid) {
+        //call api create modal
+        console.log(formData);        
+        try {
+          await registerMember(formData)
+          alert('User added successfully!');     
+          navigation.navigate('LoginMember');
+        } catch (error) {
+          console.log(error);
+      }
+
+        setFormData({
+            name: '',
+            email: '',
+            password: '',
+            image: '',
+            gender: '',
+            buildingId: '',
+            buildingName: '',
+            phoneNumber: '',
+        });
+
+        toggle();
+    }
+    };
+  
+    const handleImagePicker = () => {
+      const options = {
+        title: 'Chọn ảnh',
+        storageOptions: {
+          skipBackup: true,
+          path: 'images',
+        },
+      };
+
+      ImagePicker.showImagePicker(options, (response) => {
+        if (response.didCancel) {
+          console.log('Người dùng hủy chọn ảnh');
+        } else if (response.error) {
+          console.log('Lỗi:', response.error);
+        } else {
+          // Lưu đường dẫn hình ảnh và hiển thị nó
+          formData.image = ({ uri: response.uri });                  
+        }
+      });
+    };
+  
   return (
     <View style={styles.loginBackground}>
         <View style={styles.loginContainer}>
@@ -36,8 +134,8 @@ const RegisterMember = ({navigation}) => {
                 <TextInput
                 style={styles.input}
                 placeholder='Enter your username'
-                onChangeText={(txt) => setUsername(txt)}
-                value={username}
+                onChangeText={(event) => handleOnChangeInput(event, 'name')}
+                value={formData.name}
                 />        
             </View>
             <View style={styles.loginInput}>
@@ -45,8 +143,8 @@ const RegisterMember = ({navigation}) => {
                 <TextInput
                 style={styles.input}
                 placeholder='Enter your email'
-                onChangeText={(txt) => setEmail(txt)}
-                value={email}
+                onChangeText={(event) => handleOnChangeInput(event, 'email')}
+                value={formData.email}
                 />        
             </View>
             <View style={styles.loginInput}>
@@ -54,8 +152,8 @@ const RegisterMember = ({navigation}) => {
                 <TextInput
                 style={styles.input}
                 placeholder='Enter your password'
-                onChangeText={(txt) => setPassword(txt)}
-                value={password}
+                onChangeText={(event) => handleOnChangeInput(event, 'password')}
+                value={formData.password}
                 secureTextEntry            
                 />
             </View>                    
@@ -64,32 +162,32 @@ const RegisterMember = ({navigation}) => {
                 <TextInput
                 style={styles.input}
                 placeholder='Enter your gender'
-                onChangeText={(txt) => setGender(txt)}
-                value={gender}
+                onChangeText={(event) => handleOnChangeInput(event, 'gender')}
+                value={formData.gender}
                 />        
             </View>    
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Building Name:</Text>
                 <Picker 
-                    selectedValue={buildingname}
-                    onValueChange={(txt) => setBuildingname(txt)}
+                    selectedValue={formData.buildingname}
+                    onValueChange={(event) => handleOnChangeInput(event, 'buildingName')}
                 >
                     <Picker.Item label='Select Building Name' value='' />
-                    <Picker.Item label='Building A' value='Building A' />
-                    <Picker.Item label='Building B' value='Building B' />
-                    <Picker.Item label='Building C' value='Building C' />
+                    {buildingIds.map((buildingId) => (
+                      <Picker.Item label={buildingId.name} value={buildingId.name} />                                            
+                    ))}
                 </Picker>
             </View>
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Building Id:</Text>
                 <Picker 
-                    selectedValue={buildingid}
-                    onValueChange={(txt) => setBuildingid(txt)}
+                    selectedValue={formData.buildingid}
+                    onValueChange={(event) => handleOnChangeInput(event, 'buildingId')}
                 >
                     <Picker.Item label='Select Building Id' value='' />
-                    <Picker.Item label='ID001' value='ID001' />
-                    <Picker.Item label='ID002' value='ID002' />
-                    <Picker.Item label='ID003' value='ID003' />
+                    {buildingIds.map((buildingId) => (
+                      <Picker.Item label={buildingId.id} value={buildingId.id} />                                            
+                    ))}
                 </Picker>
             </View>      
             <View style={styles.loginInput}>
@@ -97,19 +195,25 @@ const RegisterMember = ({navigation}) => {
                 <TextInput
                 style={styles.input}
                 placeholder='Enter your phone number'
-                onChangeText={(txt) => setPhonenumber(txt)}
-                value={phonenumber}
+                onChangeText={(event) => handleOnChangeInput(event, 'phoneNumber')}
+                value={formData.phonenumber}
                 />        
             </View> 
             <View style={styles.loginInput}>
-                <TouchableOpacity onPress={handleImagePick}>
-                <Text style={styles.label}>Choose Image</Text>
-                </TouchableOpacity>
-                {image && <Image source={{ uri: image }} style={{ width: 200, height: 200}} />}
+                <TouchableOpacity 
+                onPress={handleImagePicker} 
+                onValueChange={(event) => handleOnChangeInput(event, 'image')} 
+                >
+                  {formData.image ? (
+                  <Image source={formData.image} style={styles.image} onValueChange={(event) => handleOnChangeInput(event, 'image')}  />
+                  ) : (
+                    <Text style={styles.label}>Chọn ảnh</Text>
+                  )}
+                </TouchableOpacity>                
             </View>
                 
             <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.btnLogin}>
+                <TouchableOpacity style={styles.btnLogin} onPress={handleAddNewUser}>
                 <Text style={styles.btnText}>Register</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('LoginMember')}>
@@ -189,6 +293,11 @@ const styles = StyleSheet.create({
   btnText: {
     color: 'white',
     textAlign: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
   },
 });
 
