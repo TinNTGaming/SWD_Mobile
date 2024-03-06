@@ -1,57 +1,54 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet} from "react-native";
-import {
-  checkMemberJoinClub,
-  getDetailClub,
-  MemberJoinClub,
-  MemberLeavingClub,
-  getIdMemberCreatePost,
-} from "../../services/userService";
+import { View, Text, Image, TouchableOpacity, Alert, StyleSheet  } from "react-native";
+import { checkMemberJoinClub, getDetailClub, MemberJoinClub, MemberLeavingClub, getIdMemberCreatePost } from "../../services/userService";
+import image1 from "../assets/Sport/badminton.jpg";
+import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const ClubPage = ({ route, navigation }) => {
-    const [userInfo, setUserInfo] = useState(null);
-  const { id } = route.params;
-  const [clubDetail, setClubDetail] = useState(null);
-  const [isJoined, setIsJoined] = useState(false);
-  const [memberCreatePostId, setMemberCreatePostId] = useState(null);
+const ClubPage = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const [userInfo, setUserInfo] = useState('');
 
-  useEffect(() => {
-    AsyncStorage.getItem("userInfo")
-      .then(userInfoString => {
-        const parsedUserInfo = JSON.parse(userInfoString);
-        setUserInfo(parsedUserInfo);
-      })
-      .catch(error => {
-        console.error("Error fetching user info:", error);
-      });
-  }, []);
+  const [clubDetail, setClubDetail] = useState('');
+  const [isJoined, setIsJoined] = useState('');
+  const [memberCreatePostId, setMemberCreatePostId] = useState('');
+
+
+  const getUserInfo = async()=>{
+    try {
+        const value = await AsyncStorage.getItem('userInfo')
+        if(value !== null) {
+          setUserInfo(JSON.parse (value));
+        }
+      } catch(e) {
+        console.log(e);
+      }
+  };
+  getUserInfo();
 
   const fetchClubDetail = async () => {
     try {
-      const response = await getDetailClub(id);
+      const response = await getDetailClub('1');
+      console.log(response);
       setClubDetail(response.result);
 
-      const response2 = await checkMemberJoinClub(user.id, id);
+      const response2 = await checkMemberJoinClub(userInfo.id, '1');
       setIsJoined(response2.result == 1 ? true : false);
 
       if (response2.result == 1) {
-        const memberCreatePostRes = await getIdMemberCreatePost(
-          userInfo.id,
-          id
-        );
+        const memberCreatePostRes = await getIdMemberCreatePost(userInfo.id, '1');
         setMemberCreatePostId(memberCreatePostRes.result.id);
-        console.log(memberCreatePostRes);
       }
     } catch (error) {
-      console.error("Error fetching club detail:", error);
+      console.error("Error fetching club detail:", error);   
     }
   };
 
   const handleJoinClub = async () => {
     await MemberJoinClub({
-      memberId: user.id,
-      memberName: user.name,
+      memberId: userInfo.id,
+      memberName: userInfo.name,
       clubId: clubDetail.id,
       clubName: clubDetail.name,
     });
@@ -63,156 +60,178 @@ const ClubPage = ({ route, navigation }) => {
       countMember: prevClubDetail.countMember + 1,
     }));
 
-    // Gọi hàm navigation.navigate để điều hướng đến trang khác
-    navigation.navigate("ClubDetail", {
-      clubId: clubDetail.id,
-      memberCreatePostId: memberCreatePostId,
-    });
+    // navigation.navigate("YourNextScreen"); // Replace with your desired navigation destination
   };
 
   const handleLeaveClub = async () => {
-    const confirmLeave = window.confirm("Bạn có chắc chắn muốn rời club?");
-    if (confirmLeave) {
-      await MemberLeavingClub({
-        memberId: user.id,
-        clubId: id,
-      });
-      setIsJoined(false);
+    Alert.alert(
+      "Confirm",
+      "Bạn có chắc chắn muốn rời club?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "OK",
+          onPress: async () => {
+            await MemberLeavingClub({
+              memberId: userInfo.id,
+              clubId: route.params,
+            });
+            setIsJoined(false);
 
-      setClubDetail((prevClubDetail) => ({
-        ...prevClubDetail,
-        countMember: prevClubDetail.countMember - 1,
-      }));
-    }
+            setClubDetail((prevClubDetail) => ({
+              ...prevClubDetail,
+              countMember: prevClubDetail.countMember - 1,
+            }));
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   useEffect(() => {
     fetchClubDetail();
-  }, [id]);
+  }, [route.params]);
 
   if (!clubDetail) {
-    return <View>Loading...</View>;
+    return <Text>Loading...</Text>;
   }
 
   return (
-    <View style={styles.containerClub}>
-      <View style={styles.mainClub}>
-        <View style={styles.clubHeader}>
-          <Image
-            style={styles.imgBackground}
-            source={{ uri: image1 }} // Đảm bảo thay thế đúng đường dẫn hình ảnh
-          />
-          <Text>Câu Lạc Bộ {clubDetail.name}</Text>
-          <Text>{clubDetail.countMember} thành viên</Text>
+    <View style={{ flex: 1 }}>      
+
+      <View style={{ flex: 9, alignItems: "center" }}>
+        <Image source={image1} style={{ width: 200, height: 200 }} />
+        <Text>Câu Lạc Bộ {clubDetail.name}</Text>
+        <Text>{clubDetail.countMember} thành viên</Text>
+        
+        {isJoined ? (
           <View>
-            {isJoined ? (
-              <View>
-                <TouchableOpacity
-                  style={styles.viewBtn}
-                  onPress={() =>
-                    navigation.navigate("MainClub", {
-                      clubId: clubDetail.id,
-                      memberCreatePostId: memberCreatePostId,
-                    })
-                  }
-                >
-                  <Text>Tham quan</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.leaveBtn}
-                  onPress={handleLeaveClub}
-                >
-                  <Text>Muốn rời nhóm</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.joinBtn}
-                onPress={handleJoinClub}
-              >
-                <Text>Tham gia</Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity onPress={() => navigation.navigate(`MainClub/${clubDetail.id}/${memberCreatePostId}`)}>
+              <Text>Tham quan</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleLeaveClub}>
+              <Text>Muốn rời nhóm</Text>
+            </TouchableOpacity>
           </View>
-        </View>
+        ) : (
+          <TouchableOpacity onPress={handleJoinClub}>
+            <Text>Tham gia</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
-    containerClub: {
-      flex: 1,
-      flexDirection: 'row',
-    },
-    mainClub: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    clubHeader: {
-      backgroundColor: '#FEF7F7',
-      width: '80%',
-      height: '80%',
-      borderRadius: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    imgBackground: {
-      width: '100%',
-      height: '50%',
-      borderWidth: 1,
-      borderColor: '#000',
-      borderRadius: 10,
-    },
-    viewBtn: {
-      backgroundColor: '#96dad1',
-      padding: 10,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: '#000',
-      marginRight: 10,
-    },
-    leaveBtn: {
-      backgroundColor: '#dbdbdb',
-      padding: 10,
-      borderRadius: 10,
-      borderWidth: 1,
-      borderColor: '#000',
-    },
-    postContent: {
-      flex: 1,
-      backgroundColor: '#dbdbdb',
-      borderRadius: 20,
-      paddingTop: 10,
-      alignItems: 'center',
-    },
-    contentPost: {
-      width: '80%',
-      height: 120,
-      backgroundColor: '#fff',
-      marginVertical: 15,
-      borderRadius: 20,
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 0,
-    },
-    imgPost: {
-      width: '40%',
-      height: '90%',
-      padding: 10,
-      borderWidth: 1,
-      borderColor: '#000',
-      borderRadius: 10,
-    },
-    post: {
-      width: '60%',
-      padding: 20,
-    },
-    inforPost: {
-      backgroundColor: '#d7d7d7',
-      width: '80%',
-      fontSize: 18,
-    },
-  });
+  containerClub: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  sideBar: {
+    flex: 1,
+    backgroundColor: '#95B491',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sideBarText: {
+    padding: 20,
+    fontSize: 18,
+  },
+  clubHeader: {
+    flex: 4,
+    backgroundColor: '#FEF7F7',
+    width: '80%',
+    height: 400,
+    paddingBottom: 30,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  clubHeaderText: {
+    fontSize: 24,
+    paddingTop: 20,
+    margin: 0,
+  },
+  createPost: {
+    backgroundColor: '#95B491',
+    padding: 20,
+    marginRight: 30,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#000',
+    fontWeight: 'bold',
+  },
+  btn: {
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#000',
+    fontWeight: 'bold',
+  },
+  viewBtn: {
+    marginRight: 10,
+    backgroundColor: '#96dad1',
+  },
+  leaveBtn: {
+    backgroundColor: '#dbdbdb',
+  },
+  mainClub: {
+    flex: 6,
+    alignItems: 'center',
+  },
+  imgBackground: {
+    width: '80%',
+    height: 200,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  postContent: {
+    flex: 1,
+    backgroundColor: '#dbdbdb',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: 10,
+    alignItems: 'center',
+  },
+  contentPost: {
+    width: '80%',
+    height: 300,
+    backgroundColor: '#fff',
+    marginVertical: 15,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+  },
+  imgPost: {
+    width: '40%',
+    height: '90%',
+    padding: 10,
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  post: {
+    width: '60%',
+    padding: 20,
+  },
+  postText: {
+    fontSize: 18,
+  },
+  inforPost: {
+    backgroundColor: '#d7d7d7',
+    width: '80%',
+    fontSize: 18,
+    padding: 10,
+  },
+  inforPostText: {
+    fontSize: 24,
+  },
+});
+
 
 export default ClubPage;

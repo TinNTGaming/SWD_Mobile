@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 function ClubContent() {
   const [clubs, setClubs] = useState([]);
   const navigation = useNavigation();
-
   useEffect(() => {
     fetchApiClubs();
   }, []);
@@ -22,51 +21,15 @@ function ClubContent() {
   };
 
   const handleClick = (clubId) => {
-    navigate("ClubPage", { clubId });
+    navigation.navigate("ClubPage", { clubId });
   };
 
   return (
     <View style={styles.containerClub1}>
       <View style={styles.line}></View>
       <Text style={styles.clubTitle}>Sport clubs</Text>
-      <ScrollView horizontal={true}>
-      <View style={styles.contentMiddle}>
-            <TouchableOpacity
-                  style={styles.club}
-                 onPress={()=> navigation.navigate("ClubPage")}                
-                >
-                  <Image
-                    style={styles.imageClub}
-                    source={require("../../assets/Sport/badminton.jpg")}
-                  />
-                  <Text style={styles.clubName} >
-                    Club Name: Test 1
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.club}
-                 
-                >
-                  <Image
-                    style={styles.imageClub}
-                    source={require("../../assets/Sport/badminton.jpg")}
-                  />
-                  <Text style={styles.clubName} >
-                    Club Name: Test 2
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.club}
-                 
-                >
-                  <Image
-                    style={styles.imageClub}
-                    source={require("../../assets/Sport/badminton.jpg")}
-                  />
-                  <Text style={styles.clubName} >
-                    Club Name: Test 3
-                  </Text>
-                </TouchableOpacity>
+      <ScrollView horizontal={false}>
+      <View style={styles.contentMiddle}>            
         {clubs &&
           clubs.map((item, index) => {
             if (item.status && item.status.data && item.status.data[0] === 1) {

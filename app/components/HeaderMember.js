@@ -1,6 +1,5 @@
-import React,  { useState } from 'react';
+import React,  { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 //import { handleLogoutMember } from '../../services/memberService';
 import HomeContent from './contentMember/HomeContent';
 import ClubContent from './contentMember/ClubContent';
@@ -10,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 function HeaderMember() {
 
   const [activeTab, setActiveTab] = React.useState('home');
+  const [userInfo, setUserInfo] = useState('');
 
 //   const handleLogout = async () => {
 //     try {
@@ -31,13 +31,14 @@ function HeaderMember() {
        try {
            const value = await AsyncStorage.getItem('userInfo')
            if(value !== null) {
-               userInfo =  JSON.parse (value);
+              setUserInfo(JSON.parse (value));               
            }
          } catch(e) {
            console.log(e);
          }
    };
-   getLoginInfo();
+   
+  getLoginInfo();
 
   return (
     <View style={styles.container}>
