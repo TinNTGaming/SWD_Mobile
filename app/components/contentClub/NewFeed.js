@@ -1,27 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
-import { 
-  getDetailClub, 
-  getPostInClub, 
-  createPostInSlot, 
-  UserJointSlot, 
-  getTranPoint, 
-  getSlotJoined, 
-  getNumberOfSlot, 
-  getWalletByMemberId, 
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import {
+  getDetailClub,
+  getPostInClub,
+  createPostInSlot,
+  UserJointSlot,
+  getTranPoint,
+  getSlotJoined,
+  getNumberOfSlot,
+  getWalletByMemberId,
   getYardDetail } from "../../../services/userService";
 import { useRoute } from "@react-navigation/native";
-// import { showErrorToast, showSuccessToast } from "../../component/toast/toast";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function NewFeed() {
   const route = useRoute();
   const id = route.params.id;
   const idclubmem = route.params.idclubmem;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const [userInfoLoaded, setUserInfoLoaded] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('userInfo')
+        if(value !== null) {
+          setUserInfo(JSON.parse(value));
+        }
+        setUserInfoLoaded(true);
+      } catch(e) {
+        console.log(e);
+      }
+    };
+    fetchData();
+  }, []);
 
   const [clubDetail, setClubDetail] = useState({});
   const [slotsInClub, setSlotsInClub] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [tranPoint, setTranPoint] = useState(null);
   const [numberOfSlot, setNumberOfSlot] = useState({});
   const [slotJoined, setSlotJoined] = useState([]);
@@ -29,44 +44,46 @@ function NewFeed() {
   const [isLoading, setIsLoading] = useState(true);
   const [yardDetails, setYardDetails] = useState([]);
 
-  async function fetchData() {
-    try {
-      const [clubDetailRes, slotsInClubRes, slotJoinedRes, tranPointRes] = await Promise.all([
-        getDetailClub(id),
-        getPostInClub(id),
-        getSlotJoined(idclubmem),
-        getTranPoint()
-      ]);
-
-      setTranPoint(tranPointRes.result);
-      setClubDetail(clubDetailRes.result);
-      setSlotsInClub(slotsInClubRes.result);
-      setSlotJoined(slotJoinedRes.result);
-
-      const promises = slotsInClubRes.result.map(async (item) => {
-        const response = await getNumberOfSlot(item.id);
-        return { itemId: item.id, numberOfSlot: response.result };
-      });
-
-      const results = await Promise.all(promises);
-      const numberOfSlotMap = {};
-      results.forEach((result) => {
-        numberOfSlotMap[result.itemId] = result.numberOfSlot;
-      });
-      setNumberOfSlot(numberOfSlotMap);
-
-      const walletRes = await getWalletByMemberId(userInfo.id);
-      setInforWallet(walletRes.result);
-
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  }
-
   useEffect(() => {
+    const fetchData = async () => {
+      if (userInfoLoaded && userInfo) {
+        try {
+          const [clubDetailRes, slotsInClubRes, slotJoinedRes, tranPointRes] = await Promise.all([
+            getDetailClub(id),
+            getPostInClub(id),
+            getSlotJoined(idclubmem),
+            getTranPoint()
+          ]);
+
+          setTranPoint(tranPointRes.result);
+          setClubDetail(clubDetailRes.result);
+          setSlotsInClub(slotsInClubRes.result);
+          setSlotJoined(slotJoinedRes.result);
+
+          const promises = slotsInClubRes.result.map(async (item) => {
+            const response = await getNumberOfSlot(item.id);
+            return { itemId: item.id, numberOfSlot: response.result };
+          });
+
+          const results = await Promise.all(promises);
+          const numberOfSlotMap = {};
+          results.forEach((result) => {
+            numberOfSlotMap[result.itemId] = result.numberOfSlot;
+          });
+          setNumberOfSlot(numberOfSlotMap);
+
+          const walletRes = await getWalletByMemberId(userInfo.id);
+          setInforWallet(walletRes.result);
+
+          setIsLoading(false);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
+
     fetchData();
-  }, []);
+  }, [userInfoLoaded, userInfo]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,10 +93,6 @@ function NewFeed() {
 
     fetchData();
   }, [slotsInClub]);
-
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
 
   const handleCreatePost = async (postData) => {
     postData.memberPostName = userInfo.name;
@@ -121,16 +134,16 @@ function NewFeed() {
     <View style={styles.container}>
       <Text style={styles.clubTitle}>{clubDetail.name}</Text>
 
-      <TouchableOpacity style={styles.postContainer} onPress={toggleModal}>
-        <Image source={{uri: userInfo.image}} style={styles.avatar} />
+      <TouchableOpacity style={styles.postContainer}>
+        <Image source={userInfo && userInfo.image ? { uri: userInfo.image } : null} style={styles.avatar} />
         <Text style={styles.writeBtn}>
-          <Text>{userInfo.name} ơi</Text>
+          <Text>{userInfo ? userInfo.name : 'Guest'} ơi</Text>
           <Text style={{ marginLeft: 5 }}>Bạn đang muốn gì thế?</Text>
         </Text>
       </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Bài viết mới nhất</Text>
-
+      <ScrollView>
       {isLoading && <ActivityIndicator style={styles.loadingIcon} size="large" color="#0000ff" />}
 
       {slotsInClub.map((item, index) => {
@@ -146,6 +159,7 @@ function NewFeed() {
         const isFull = remainingSlots <= 0;
 
         return (
+
           <View key={item.id} style={styles.mainPostContainer}>
             <View style={styles.posterName}>
               <Text>{item.memberPostName}</Text>
@@ -180,14 +194,22 @@ function NewFeed() {
               </View>
             );
           })}
+          </ScrollView>
         </View>
+
       );
+
     }
-    
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
+      },
+      clubTitle:{
+        fontSize: 30,
+        fontWeight: "bold",
+        textAlign: 'center'
       },
       clubTitleNewFeed: {
         marginLeft: "15%",
@@ -261,5 +283,5 @@ const styles = StyleSheet.create({
         marginTop: 10,
       },
 });
-    
+
 export default NewFeed;

@@ -119,7 +119,7 @@ const ClubPage = () => {
         
         {isJoined ? (
           <View>
-            <TouchableOpacity onPress={() => navigation.navigate(`MainClubPage/${clubDetail.id}/${memberCreatePostId}`)}>
+            <TouchableOpacity onPress={() => navigation.navigate('MainClubPage', { id: clubDetail.id, idclubmem: memberCreatePostId })}>
               <Text style={styles.btn}>Tham quan</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLeaveClub}>
