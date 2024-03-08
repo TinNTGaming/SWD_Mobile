@@ -13,6 +13,7 @@ const ClubPage = () => {
   const [clubDetail, setClubDetail] = useState(null);
   const [isJoined, setIsJoined] = useState(false);
   const [memberCreatePostId, setMemberCreatePostId] = useState(null);
+  const [userInfoLoaded, setUserInfoLoaded] = useState(false);
 
 
   const getUserInfo = async()=>{
@@ -93,12 +94,17 @@ const ClubPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      await getUserInfo(); // Gọi getUserInfo trong useEffect để đảm bảo userInfo đã được cập nhật
-      console.log(userInfo);
-      fetchClubDetail(); // Sau khi userInfo đã được cập nhật, gọi fetchClubDetail
+      await getUserInfo();
+      setUserInfoLoaded(true);
     };
     fetchData();
-  }, [route.params.clubId]);
+  }, []);
+
+  useEffect(() => {
+    if (userInfoLoaded) {
+      fetchClubDetail();
+    }
+  }, [userInfoLoaded]);
 
   if (!clubDetail) {
     return <Text>Loading...</Text>;
