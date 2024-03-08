@@ -10,11 +10,11 @@ const LoginMember = ({navigation}) => {
 
   const doLogin = async() => {
     if (username.length == 0){
-      alert('Username is required'); 
+      alert('Bạn chưa điền email'); 
       return;
     }
     if (password.length == 0){
-      alert('Password is required');
+      alert('Bạn chưa điền mật khẩu');
       return;
     }
     
@@ -28,7 +28,7 @@ const LoginMember = ({navigation}) => {
       }
     } catch (error) {
       console.error(error);
-      alert('An error occurred during login.');
+      alert('Đăng nhập thất bại, hãy thử lại');
     }
   };
 
@@ -36,30 +36,30 @@ const LoginMember = ({navigation}) => {
     <View style={styles.loginBackground}>
       <View style={styles.loginContainer}>
         <View style={styles.loginContent}>
-          <Text style={styles.textLogin}>Member Login</Text>
+          <Text style={styles.textLogin}>Đăng nhập thành viên</Text>
           <View style={styles.loginInput}>
-            <Text style={styles.label}>Username:</Text>
+            <Text style={styles.label}>Email:</Text>
             <TextInput
               style={styles.input}
-              placeholder='Enter your username'
+              placeholder='Nhận email của bạn'
               onChangeText={(txt) => setUsername(txt)}
             />        
           </View>
           <View style={styles.loginInput}>
-            <Text style={styles.label}>Password:</Text>
+            <Text style={styles.label}>Mật khẩu:</Text>
             <TextInput
               style={styles.input}
-              placeholder='Enter your password'
+              placeholder='Nhập mật khẩu của bạn'
               onChangeText={(txt) => setPassword(txt)}
               secureTextEntry            
             />
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity style={styles.btnLogin} onPress={doLogin}>
-              <Text style={styles.btnText}>Login</Text>
+              <Text style={styles.btnText}>Đăng nhập</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('RegisterMember')}>
-              <Text style={styles.btnText}>Create new account</Text>
+              <Text style={styles.btnText}>Tạo mới người dùng</Text>
             </TouchableOpacity>
           </View>
         </View>

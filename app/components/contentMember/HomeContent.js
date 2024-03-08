@@ -31,7 +31,7 @@ function HomeContent() {
       {/* <SportSlide /> */}
 
       <View style={styles.imgClub}>
-        <Text style={styles.joinTitle}>Join with us?</Text>
+        <Text style={styles.joinTitle}>Hãy tham gia với chúng tôi</Text>
         <View style={styles.contentMiddle}>
           <Image source={image1} style={styles.clubImage} />
           <Image source={image2} style={styles.clubImage} />

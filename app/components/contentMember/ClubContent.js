@@ -41,7 +41,7 @@ function ClubContent() {
                 >
                   <Image
                     style={styles.imageClub}
-                    source={require("../../assets/Sport/badminton.jpg")}
+                    source={{ uri: item.image }}
                   />
                   <Text style={styles.clubName} onPress={() => handleClick(item.id)}>
                     Club Name: {item.name}
@@ -58,46 +58,50 @@ function ClubContent() {
 const styles = StyleSheet.create({
   containerClub1: {
     backgroundColor: "#fff",
-    height: "100%",
-    flexDirection: "column",
+    flex: 1,
   },
   line: {
     height: 1,
     width: "80%",
     backgroundColor: "#000",
-    margin: 5,
+    marginVertical: 5,
     alignSelf: "center",
   },
   clubTitle: {
     color: "#000",
     marginTop: 5,
     textAlign: "center",
-    fontSize: 30
+    fontSize: 30,
+    marginBottom: 10, 
   },
   contentMiddle: {
-    marginTop: 30,
-    flexDirection: 'row',
-    padding: 10,
-    gap: 10
+    flexDirection: "row",
+    flexWrap: "wrap", 
+    justifyContent: "center", 
   },
   imageClub: {
     height: 100,
     width: 150,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   club: {
-    height: 170,
+    height: 200, 
+    width: 160, 
     flexDirection: "column",
-    textAlign: "center",
+    justifyContent: "center", 
+    alignItems: "center", 
     borderColor: "#000",
     borderWidth: 1,
-    padding: 20,
+    padding: 10,
+    margin: 10, 
   },
   clubName: {
     fontWeight: "bold",
     fontSize: 16,
-    textDecorationLine: "none",
+    textAlign: "center", 
+    marginTop: 10, 
   },
 });
+
 
 export default ClubContent;

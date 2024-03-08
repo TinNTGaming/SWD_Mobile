@@ -9,12 +9,6 @@ const HomePage = ({ navigation }) => {
             <View style={styles.loginBtnContainer}>
                 <TouchableOpacity
                     style={styles.loginBtn}
-                    onPress={() => navigation.navigate('LoginAdmin')}
-                >
-                    <Text style={styles.loginText}>Login Admin</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={styles.loginBtn}
                     onPress={() => navigation.navigate('LoginMember')}
                 >
                     <Text style={styles.loginText}>Login Member</Text>

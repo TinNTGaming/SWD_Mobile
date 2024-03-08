@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet } from "react-native";
-import ModalCreatePost from "../../component/modal/ModalCreatePost";
-import { getDetailClub, getPostInClub, createPostInSlot, UserJointSlot, getTranPoint, getSlotJoined, getNumberOfSlot, getWalletByMemberId, getYardDetail } from "../../services/userService";
+import { 
+  getDetailClub, 
+  getPostInClub, 
+  createPostInSlot, 
+  UserJointSlot, 
+  getTranPoint, 
+  getSlotJoined, 
+  getNumberOfSlot, 
+  getWalletByMemberId, 
+  getYardDetail } from "../../../services/userService";
 import { useRoute } from "@react-navigation/native";
-import { showErrorToast, showSuccessToast } from "../../component/toast/toast";
+// import { showErrorToast, showSuccessToast } from "../../component/toast/toast";
 
 function NewFeed() {
   const route = useRoute();
@@ -79,12 +87,12 @@ function NewFeed() {
     postData.memberPostId = idclubmem;
     try {
       await createPostInSlot(postData);
-      showSuccessToast("Create post successfully!");
+      // showSuccessToast("Create post successfully!");
       setIsModalOpen(false);
       setIsLoading(true);
       fetchData();
     } catch (error) {
-      showErrorToast("Create post error!");
+      // showErrorToast("Create post error!");
       console.error("Error creating post:", error);
     }
   };
@@ -104,7 +112,7 @@ function NewFeed() {
       // Refresh page
       fetchData();
     } catch (error) {
-      showErrorToast("Error joining slot!");
+      // showErrorToast("Error joining slot!");
       console.error("Error joining slot:", error);
     }
   }
@@ -172,7 +180,6 @@ function NewFeed() {
               </View>
             );
           })}
-          <ModalCreatePost isOpen={isModalOpen} toggle={toggleModal} createPost={handleCreatePost} />
         </View>
       );
     }
