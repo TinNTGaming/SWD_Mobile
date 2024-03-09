@@ -116,7 +116,8 @@ const MainClubPage = () => {
                                    tranPoint={tranPoint}
                                    inforWallet={inforWallet}
                                    yards={yards}/>}
-        {activeTab === "myJoinPost" && <MyJoinPost />}
+        {activeTab === "myJoinPost" && <MyJoinPost
+                                        yards={yards}/>}
         {activeTab === "myHistory" && <HistoryPage />}
       </View>
       
