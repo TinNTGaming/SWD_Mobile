@@ -155,8 +155,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#cad4c9",
   },
   contentContainer: {
-    flex: 1, // Nội dung chiếm phần còn lại của mainClubContainer
-    backgroundColor: "#fff", // Màu nền nếu cần
+    flex: 1,
+    backgroundColor: "#fff",
   },
 });
 
