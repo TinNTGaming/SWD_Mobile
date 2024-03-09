@@ -15,6 +15,7 @@ import MyPost from "../components/contentClub/MyPost";
 import MyJoinPost from "../components/contentClub/MyJoinPost";
 import HistoryPage from "../components/contentClub/HistoryPage";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MainClubPage = () => {
   const [activeTab, setActiveTab] = useState('newFeed');

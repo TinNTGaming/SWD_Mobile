@@ -8,6 +8,7 @@ import RegisterMember from './app/screens/RegisterMember';
 import MemberPage from './app/screens/MemberPage';
 import ClubPage from './app/screens/ClubPage';
 import MainClubPage from './app/screens/MainClubPage';
+import CreatePostPage from './app/screens/CreatePostPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,6 +22,7 @@ export default function App() {
         <Stack.Screen name='MemberPage' component={MemberPage} options={{headerShown: false}}/>
         <Stack.Screen name='ClubPage' component={ClubPage} options={{headerShown: false}}/>
         <Stack.Screen name='MainClubPage' component={MainClubPage} options={{headerShown: false}}/>
+        <Stack.Screen name='CreatePostPage' component={CreatePostPage} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

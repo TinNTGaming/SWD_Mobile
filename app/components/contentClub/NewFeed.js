@@ -3,20 +3,20 @@ import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Scr
 import {
   getDetailClub,
   getPostInClub,
-  createPostInSlot,
   UserJointSlot,
   getTranPoint,
   getSlotJoined,
   getNumberOfSlot,
   getWalletByMemberId,
   getYardDetail } from "../../../services/userService";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function NewFeed() {
   const route = useRoute();
   const id = route.params.id;
   const idclubmem = route.params.idclubmem;
+  const navigation = useNavigation();
 
   const [userInfoLoaded, setUserInfoLoaded] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
@@ -94,22 +94,6 @@ function NewFeed() {
     fetchData();
   }, [slotsInClub]);
 
-  const handleCreatePost = async (postData) => {
-    postData.memberPostName = userInfo.name;
-    postData.clubId = id;
-    postData.memberPostId = idclubmem;
-    try {
-      await createPostInSlot(postData);
-      // showSuccessToast("Create post successfully!");
-      setIsModalOpen(false);
-      setIsLoading(true);
-      fetchData();
-    } catch (error) {
-      // showErrorToast("Create post error!");
-      console.error("Error creating post:", error);
-    }
-  };
-
   async function handleJoinSlot(slotId) {
     try {
       await UserJointSlot({
@@ -134,7 +118,7 @@ function NewFeed() {
     <View style={styles.container}>
       <Text style={styles.clubTitle}>{clubDetail.name}</Text>
 
-      <TouchableOpacity style={styles.postContainer}>
+        <TouchableOpacity style={styles.postContainer} onPress={() => navigation.navigate('CreatePostPage', { clubDetail, idclubmem })}>
         <Image source={userInfo && userInfo.image ? { uri: userInfo.image } : null} style={styles.avatar} />
         <Text style={styles.writeBtn}>
           <Text>{userInfo ? userInfo.name : 'Guest'} ơi</Text>
