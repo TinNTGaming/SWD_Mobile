@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
@@ -8,9 +8,14 @@ import NewFeed from "../components/contentClub/NewFeed";
 import MyPost from "../components/contentClub/MyPost";
 import MyJoinPost from "../components/contentClub/MyJoinPost";
 import HistoryPage from "../components/contentClub/HistoryPage";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const MainClubPage = () => {
-  const [activeTab, setActiveTab] = useState("newFeed");
+  const [activeTab, setActiveTab] = useState('newFeed');
+  const navigation = useNavigation();
+  const route = useRoute();
+  const id = route.params.id;
+  const idclubmem = route.params.idclubmem;
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -19,7 +24,7 @@ const MainClubPage = () => {
   return (
     <View style={styles.mainClubContainer}>
       <View style={styles.sideBarMain}>
-        <TouchableOpacity style={styles.btnBackHome} onPress={() => navigate("/members")}>
+        <TouchableOpacity style={styles.tabBtn} onPress={() => navigation.navigate('MemberPage')}>
           <FontAwesomeIcon icon={faHome} />
           <Text>Home</Text>
         </TouchableOpacity>
@@ -61,7 +66,7 @@ const MainClubPage = () => {
         {activeTab === "myPost" && <MyPost />}
         {activeTab === "myJoinPost" && <MyJoinPost />}
         {activeTab === "myHistory" && <HistoryPage />}
-      </View>  
+      </View>
       
     </View>
   );
@@ -71,26 +76,25 @@ const styles = StyleSheet.create({
   mainClubContainer: {
     flex: 1,
     flexDirection: "column",
+    paddingTop: 20,
   },
   sideBarMain: {
     flexDirection: "row",
     backgroundColor: "#fff",
     height: 80,
     borderBottomWidth: 1,
+    borderTopWidth: 1,
     borderBottomColor: "#e9e1e1",
+    borderTopColor: "#e9e1e1",
   },
   tabBtn: {
-    width: "100%",
+    width: "20%",
     paddingVertical: 20,
     paddingHorizontal: 10,
     fontWeight: "bold",
     textAlign: "center",
     borderBottomWidth: 1,
     borderBottomColor: "#e9e1e1",
-  },
-  btnBackHome: {
-    marginBottom: 10,
-    borderBottomColor: "#000",
   },
   tabBtnText: {
     fontWeight: "bold",
