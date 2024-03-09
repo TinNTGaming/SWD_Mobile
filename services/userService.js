@@ -133,6 +133,10 @@ const getYardDetail = (yard) => {
   return axios.get(`api/yards/${yard}`);
 };
 
+const getYards = () => {
+  return axios.get(`api/yards`);
+};
+
 export {
   getAllMembers,
   handleLogOut,
@@ -166,4 +170,5 @@ export {
   getSlotJoinedByPostJoined,
   getSlotPostJoined,
   getYardDetail,
+  getYards
 };

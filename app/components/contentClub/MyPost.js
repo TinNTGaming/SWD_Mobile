@@ -13,14 +13,29 @@ import {
   confirmNoJoining,
   confirmJoining,
 } from "../../../services/memberService";
-// import CountdownTimer from "../../component/countDownTime";
+import CountdownTimer from "../CountdownTime";
 import { useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function MyPost({ tranPoint, inforWallet, yards }) {
   const route = useRoute();
   const id = route.params.id;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const [userInfoLoaded, setUserInfoLoaded] = useState(false);
+    const [userInfo, setUserInfo] = useState(null);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const value = await AsyncStorage.getItem('userInfo')
+          if(value !== null) {
+            setUserInfo(JSON.parse(value));
+          }
+          setUserInfoLoaded(true);
+        } catch(e) {
+          console.log(e);
+        }
+      };
+      fetchData();
+    }, []);
 
   const [myPost, setMyPost] = useState([]);
   const [numberOfSlot, setNumberOfSlot] = useState({});
@@ -28,6 +43,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+  if (userInfoLoaded && userInfo) {
     async function fetchData() {
       try {
         const response1 = await getIdMemberCreatePost(userInfo.id, id);
@@ -64,10 +80,10 @@ function MyPost({ tranPoint, inforWallet, yards }) {
         console.log(error);
       }
     }
-
+    }
     fetchData();
     setIsLoading(true);
-  }, [id, userInfo.id]);
+  }, [userInfoLoaded, userInfo]);
 
   const handleConfirmJoin = async (idClubMember, idSlot, memberId) => {
     try {

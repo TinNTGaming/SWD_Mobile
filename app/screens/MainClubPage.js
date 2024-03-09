@@ -4,6 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { faNewspaper, faEnvelope } from "@fortawesome/free-regular-svg-icons";
 
+import {
+  getTranPoint,
+  getWalletByMemberId,
+  getYards,
+} from "../../services/userService";
+
 import NewFeed from "../components/contentClub/NewFeed";
 import MyPost from "../components/contentClub/MyPost";
 import MyJoinPost from "../components/contentClub/MyJoinPost";
@@ -16,6 +22,31 @@ const MainClubPage = () => {
   const route = useRoute();
   const id = route.params.id;
   const idclubmem = route.params.idclubmem;
+
+  const [inforWallet, setInforWallet] = useState();
+    const [tranPoint, setTranPoint] = useState({});
+    const [yards, setYards] = useState([]);
+
+
+  useEffect(() => {
+      const fetchWalletData = async () => {
+        try {
+          // Sử dụng Promise.all để gửi các yêu cầu cùng một lúc
+          const [walletRes, tranPointRes, yardsRes] = await Promise.all([
+            getWalletByMemberId(userInfo.id),
+            getTranPoint(),
+            getYards(),
+          ]);
+
+          // Đặt thông tin ví, điểm giao dịch và các khu vực vào trạng thái
+          setInforWallet(walletRes.result);
+          setTranPoint(tranPointRes.result);
+          setYards(yardsRes.result);
+        } catch (error) {
+          console.error("Error fetching wallet data:", error);
+        }
+      };
+    });
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -63,14 +94,17 @@ const MainClubPage = () => {
       </View>
       <View style={styles.contentContainer}>
         {activeTab === "newFeed" && <NewFeed />}
-        {activeTab === "myPost" && <MyPost />}
+        {activeTab === "myPost" && <MyPost
+                                   tranPoint={tranPoint}
+                                   inforWallet={inforWallet}
+                                   yards={yards}/>}
         {activeTab === "myJoinPost" && <MyJoinPost />}
         {activeTab === "myHistory" && <HistoryPage />}
       </View>
       
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   mainClubContainer: {
