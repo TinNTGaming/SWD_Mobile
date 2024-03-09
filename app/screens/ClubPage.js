@@ -112,12 +112,21 @@ const ClubPage = () => {
     return <Text>Loading...</Text>;
   }
 
+  const date = new Date(clubDetail.dateTime);
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+  const timePost = `  ${day}-${month}-${year}`;
+
   return (
     <View style={styles.containerClub}>      
       <View style={styles.clubHeader}>
         <Image source={{ uri: clubDetail.image }} style={{ width: 200, height: 200 }} />
         <Text style={styles.clubHeaderText}>Câu Lạc Bộ {clubDetail.name}</Text>
         <Text>{clubDetail.countMember} thành viên</Text>
+        <Text>Mô tả: {clubDetail.description}</Text>
+        <Text>Ngày thành lập: {timePost}</Text>
+        <Text>Người quản lí: {clubDetail.staffName}</Text>
         
         {isJoined ? (
           <View>

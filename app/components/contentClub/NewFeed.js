@@ -155,6 +155,23 @@ function NewFeed() {
 
         if (isJoined) return null;
 
+        const time = item.date + "T" + item.startTime + ":00";
+        const targetTime = new Date(time).getTime();
+        const currentTime = new Date().getTime();
+
+        if (targetTime < currentTime) {
+          return null;
+        }
+
+        const date = new Date(item.dateTime);
+
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const timePost = ` ${hours}:${minutes} ${day}-${month}-${year}`;
+
         const remainingSlots = parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0);
         const isFull = remainingSlots <= 0;
 
@@ -163,7 +180,7 @@ function NewFeed() {
           <View key={item.id} style={styles.mainPostContainer}>
             <View style={styles.posterName}>
               <Text>{item.memberPostName}</Text>
-              <Text>{item.dateTime}</Text>
+              <Text>{timePost}</Text>
             </View>
             <Text style={styles.caption}>{item.description}</Text>
             <View style={styles.postContentContainer}>
