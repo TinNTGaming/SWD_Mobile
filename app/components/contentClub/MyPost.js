@@ -248,14 +248,18 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                           status.joinStatus === "confirm_joined"
                                         ) {
                                           return (
-                                            <Text key={`${member.id}-confirm-joined`} style={styles.confirmText}>Đã tham gia</Text>
+                                            <TouchableOpacity style={ styles.btnConfirm }>
+                                                <Text key={`${member.id}-confirm-joined`} style={styles.confirmText}>Đã tham gia</Text>
+                                            </TouchableOpacity>
                                           );
                                         } else if (
                                           status.joinStatus ===
                                           "confirm_no_joined"
                                         ) {
                                           return (
+                                          <TouchableOpacity style={ styles.btnCancel }>
                                             <Text key={`${member.id}-confirm-no-joined`} style={styles.cancelText}>Không tham gia</Text>
+                                          </TouchableOpacity>
                                           );
                                         }
                                       }
@@ -420,7 +424,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: "8px 16px",
     marginRight: 8,
-    cursor: "pointer",
     backgroundColor: "#4caf50",
     color: "white",
   },
@@ -429,9 +432,26 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: "8px 16px",
     marginRight: 8,
-    cursor: "pointer",
     backgroundColor: "#f44336",
     color: "white",
+  },
+  btnConfirm: {
+    backgroundColor: 'green',
+    width: 80,
+    paddingBottom: 5,
+    paddingTop: 5,
+  },
+  confirmText: {
+    color: 'white',
+  },
+  btnCancel: {
+    backgroundColor: 'red',
+    width: 100,
+    paddingBottom: 5,
+    paddingTop: 5,
+  },
+  cancelText: {
+    color: 'white',
   },
   memberJoin: {
     marginTop: 30,
@@ -443,7 +463,6 @@ const styles = StyleSheet.create({
   },
   memberItem: {
     display: "flex",
-    alignItems: "center",
     marginTop: 10,
   },
 });
