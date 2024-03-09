@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -43,8 +43,9 @@ function MyPost({ tranPoint, inforWallet, yards }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-  if (userInfoLoaded && userInfo) {
-    async function fetchData() {
+  
+    const fetchData = async () => {
+      if (userInfoLoaded && userInfo) {
       try {
         const response1 = await getIdMemberCreatePost(userInfo.id, id);
         const memberCreatePostId = response1.result.id;
@@ -135,6 +136,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
   return (
     <View style={styles.container}>
       <Text>Bài viết của bạn</Text>
+      <ScrollView>
       {isLoading && <ActivityIndicator style={styles.loadingIcon} size="large" color="#0000ff" />}
       {myPost.length === 0 ? (
         <Text style={styles.noPostsMessage}>Bạn chưa đăng bài, hãy cùng kiếm đồng đội nhé</Text>
@@ -171,9 +173,9 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                     <Text>{item.memberPostName}</Text>
                     <Text>{timePost}</Text>
                   </View>
-                  {/* <View>
+                  <View>
                     <CountdownTimer targetTime={time} />
-                  </View> */}
+                  </View>
                 </View>
 
                 <Text style={styles.caption}>{item.description}</Text>
@@ -210,7 +212,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                             {postItem.members.length > 0 ? (
                               postItem.members.map((member) => (
                                 <View key={member.id} style={styles.memberItem}>
-                                  <Text>{member.memberName}</Text>{" "}
+                                  <Text>{member.memberName}</Text>
                                   <View>
                                     {postItem.status.map((status) => {
                                       if (status.clubMemberId === member.id) {
@@ -275,6 +277,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
           })}
         </>
       )}
+      </ScrollView>
     </View>
   );
 }

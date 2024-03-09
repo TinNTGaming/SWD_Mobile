@@ -22,6 +22,22 @@ const MainClubPage = () => {
   const route = useRoute();
   const id = route.params.id;
   const idclubmem = route.params.idclubmem;
+  const [userInfoLoaded, setUserInfoLoaded] = useState(false);
+      const [userInfo, setUserInfo] = useState(null);
+      useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const value = await AsyncStorage.getItem('userInfo')
+            if(value !== null) {
+              setUserInfo(JSON.parse(value));
+            }
+            setUserInfoLoaded(true);
+          } catch(e) {
+            console.log(e);
+          }
+        };
+        fetchData();
+      }, []);
 
   const [inforWallet, setInforWallet] = useState();
     const [tranPoint, setTranPoint] = useState({});
@@ -29,6 +45,7 @@ const MainClubPage = () => {
 
 
   useEffect(() => {
+  if (userInfoLoaded && userInfo) {
       const fetchWalletData = async () => {
         try {
           // Sử dụng Promise.all để gửi các yêu cầu cùng một lúc
@@ -46,7 +63,8 @@ const MainClubPage = () => {
           console.error("Error fetching wallet data:", error);
         }
       };
-    });
+    }
+    }, [userInfoLoaded]);
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
