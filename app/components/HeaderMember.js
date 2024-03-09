@@ -1,27 +1,29 @@
 import React,  { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
-//import { handleLogoutMember } from '../../services/memberService';
+import { handleLogoutMember } from '../../services/memberService';
 import HomeContent from './contentMember/HomeContent';
 import ClubContent from './contentMember/ClubContent';
 import Contact from '../components/FooterMember';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 function HeaderMember() {
 
   const [activeTab, setActiveTab] = React.useState('home');
   const [userInfo, setUserInfo] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const navigation = useNavigation()
 
-//   const handleLogout = async () => {
-//     try {
-//       await handleLogoutMember();
-//       // Use AsyncStorage for React Native instead of localStorage
-//       // AsyncStorage.removeItem('token');
-//       // AsyncStorage.removeItem('userInfo');
-//       navigation.navigate('/');
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
+   const handleLogout = async () => {
+     try {
+       await handleLogoutMember();
+        AsyncStorage.removeItem('token');
+        AsyncStorage.removeItem('userInfo');
+       navigation.navigate('HomePage');
+     } catch (error) {
+       console.log(error);
+     }
+   };
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -31,13 +33,13 @@ function HeaderMember() {
        try {
            const value = await AsyncStorage.getItem('userInfo')
            if(value !== null) {
-              setUserInfo(JSON.parse (value));               
+              setUserInfo(JSON.parse (value));
            }
          } catch(e) {
            console.log(e);
          }
    };
-   
+
   getLoginInfo();
 
   return (
@@ -71,24 +73,33 @@ function HeaderMember() {
                   <Text style={{ fontWeight: 'bold' }}>Contact</Text>
                 </Text>
               </TouchableOpacity>
-            </View>          
+            </View>
           </View>
         </View>
         <View style={styles.contentRight}>
+        <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
           <View style={styles.headerUserInfo}>
             <Text style={{ fontSize: 13, fontWeight: '300', textTransform: 'uppercase' }}>
               {userInfo.name}
             </Text>
           </View>
+          </TouchableOpacity>
         </View>
       </View>
+      {showDropdown && (
+              <View style={styles.dropdown}>
+                <TouchableOpacity onPress={handleLogout}>
+                  <Text style={styles.logoutText}>Đăng xuất</Text>
+                </TouchableOpacity>
+              </View>
+            )}
       <View style={styles.content}>
         {activeTab === 'home' && <HomeContent />}
         {activeTab === 'club' && <ClubContent />}
         {activeTab === 'contact' && <Contact />}
       </View>
     </View>
-    
+
   );
 };
 const styles = StyleSheet.create({
@@ -150,6 +161,22 @@ const styles = StyleSheet.create({
     content:{
       flex: 1,
       marginTop: 70
-    }
+    },
+
+    dropdown: {
+        position: 'absolute',
+        top: 70,
+        right: 10,
+        backgroundColor: '#fff',
+        borderRadius: 5,
+        padding: 10,
+        zIndex: 1001,
+      },
+      logoutText: {
+        fontSize: 13,
+        fontWeight: '300',
+        textTransform: 'uppercase',
+        color: 'red',
+      }
   });
 export default HeaderMember;
