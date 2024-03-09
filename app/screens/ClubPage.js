@@ -27,7 +27,6 @@ const ClubPage = () => {
   };
 
   const fetchClubDetail = async () => {
-    console.log(userInfo);
     try {
       const response = await getDetailClub(route.params.clubId);      
       setClubDetail(response.result);
@@ -36,7 +35,10 @@ const ClubPage = () => {
       setIsJoined(response2.result == 1 ? true : false);
 
       if (response2.result == 1) {
-        const memberCreatePostRes = await getIdMemberCreatePost(userInfo.id, route.params.clubId);
+        const memberCreatePostRes = await getIdMemberCreatePost(
+          userInfo.id, 
+          route.params.clubId
+        );
         setMemberCreatePostId(memberCreatePostRes.result.id);
       }
     } catch (error) {
@@ -94,7 +96,6 @@ const ClubPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       await getUserInfo(); // Gọi getUserInfo trong useEffect để đảm bảo userInfo đã được cập nhật
-      console.log(userInfo);
       fetchClubDetail(); // Sau khi userInfo đã được cập nhật, gọi fetchClubDetail
     };
     fetchData();
@@ -107,7 +108,7 @@ const ClubPage = () => {
   return (
     <View style={styles.containerClub}>      
       <View style={styles.clubHeader}>
-        <Image source={image1} style={{ width: 200, height: 200 }} />
+        <Image source={{ uri: clubDetail.image }} style={{ width: 200, height: 200 }} />
         <Text style={styles.clubHeaderText}>Câu Lạc Bộ {clubDetail.name}</Text>
         <Text>{clubDetail.countMember} thành viên</Text>
         
