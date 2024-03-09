@@ -126,11 +126,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   historyWrapper: {
-    flexDirection: "row",
+    flex: 1,
     marginTop: 10,
   },
   walletDetailPopup: {
-    flex: 1,
+    marginBottom: 10, // Added marginBottom
   },
   detailTitle: {
     fontSize: 18,
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     color: "gold",
   },
   usersTable: {
-    flex: 2,
+    flex: 1,
   },
   loadingSpinner: {
     marginTop: 20,
@@ -154,26 +154,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   table: {
-      borderWidth: 1,
-      borderColor: '#000',
-      marginVertical: 10,
-    },
-    row: {
-      flexDirection: 'row',
-      borderBottomWidth: 1,
-      borderColor: '#000',
-    },
-    headerCell: {
-      flex: 1,
-      padding: 10,
-      fontWeight: 'bold',
-      textAlign: 'center',
-    },
-    cell: {
-      flex: 1,
-      padding: 10,
-      textAlign: 'center',
-    },
+    borderWidth: 1,
+    borderColor: '#000',
+    marginVertical: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderColor: '#000',
+  },
+  headerCell: {
+    flex: 1,
+    padding: 10,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  cell: {
+    flex: 1,
+    paddingTop: 10,
+    paddingBottom: 10,
+    textAlign: 'center',
+  },
 });
 
 export default HistoryPage;
