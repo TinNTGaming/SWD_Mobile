@@ -106,10 +106,10 @@ function MyPost({ tranPoint, inforWallet, yards }) {
       const response3Results = await Promise.all(response3Promises);
       setMemberJoinList(response3Results);
 
-      showSuccessToast("Confirm successful!");
+      alert("Xác nhận thành công!");
     } catch (error) {
       console.log(error);
-      showErrorToast("Confirm failed!");
+      alert("Lỗi!");
     }
   };
 
@@ -127,15 +127,15 @@ function MyPost({ tranPoint, inforWallet, yards }) {
 
       const response3Results = await Promise.all(response3Promises);
       setMemberJoinList(response3Results);
-      showSuccessToast("Cancel successful!");
+      alert("Xác nhận không tham gia!");
     } catch (error) {
-      showErrorToast("Cancel failed!");
+      alert("Lỗi!");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text>Bài viết của bạn</Text>
+      <Text style={styles.clubTitleNewFeed}>Bài viết của bạn</Text>
       <ScrollView>
       {isLoading && <ActivityIndicator style={styles.loadingIcon} size="large" color="#0000ff" />}
       {myPost.length === 0 ? (
@@ -296,12 +296,15 @@ const styles = StyleSheet.create({
     height: 51,
     position: "fixed",
     backgroundColor: "#e8eee7",
-    padding: "5px 40px",
     borderRadius: 5,
     width: "70%",
-    color: "#fff",
+    color: "black",
     fontWeight: "700",
     fontSize: 24,
+    marginTop: 10,
+    marginBottom: 10,
+    textAlign:'center',
+    padding: 8
   },
   postContainer: {
     margin: "50px auto 20px",
@@ -465,6 +468,9 @@ const styles = StyleSheet.create({
     display: "flex",
     marginTop: 10,
   },
+  noPostsMessage: {
+    fontSize: 18
+  }
 });
 
 export default MyPost;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faImages, faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import {
@@ -9,7 +9,9 @@ import {
   faPersonShelter,
   faSignsPost,
 } from "@fortawesome/free-solid-svg-icons";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Picker } from "@react-native-picker/picker";
+import { launchImageLibrary } from 'react-native-image-picker';
 import axios from "axios";
 import { getYardsBySport, createPostInSlot } from "../../services/userService";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -56,6 +58,8 @@ function CreatePostPage() {
   const [yards, setYards] = useState([]);
   const [yardId, setYardId] = useState("");
 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
   useEffect(() => {
       const fetchYards = async () => {
       if (userInfoLoaded && userInfo) {
@@ -83,6 +87,12 @@ function CreatePostPage() {
       setYardId(selectedYard.id);
     }
   };
+
+  const handleImagePicker = async () => {
+      const result = await launchImageLibrary();
+      console.error('Test',result);
+      handleOnChangeInput(result.assets[0].uri, 'image');
+    };
 
   const uploadCloudinary = async (image) => {
     const formDataImage = new FormData();
@@ -123,6 +133,22 @@ function CreatePostPage() {
     }
   };
 
+    const showDatePicker = () => {
+      setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+      setDatePickerVisibility(false);
+    };
+
+    const handleConfirmDate = (date) => {
+      setFormData({
+        ...formData,
+        date: date.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+      });
+      hideDatePicker();
+    };
+
   const hours = [];
   for (let i = 5; i <= 21; i++) {
     const hour = `${i < 10 ? "0" : ""}${i}:00`;
@@ -152,10 +178,14 @@ function CreatePostPage() {
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faCalendarDays} /> Ngày
           </Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(value) => handleOnChangeInput(value, "date")}
-            value={formData.date}
+          <TouchableOpacity onPress={showDatePicker}>
+              <Text style={styles.input}>{formData.date}</Text>
+          </TouchableOpacity>
+          <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirmDate}
+              onCancel={hideDatePicker}
           />
         </View>
         <View style={styles.formGroup}>
@@ -232,18 +262,21 @@ function CreatePostPage() {
 
         <View style={styles.formGroup}>
           <View>
-            <FontAwesomeIcon icon={faImages} style={{ fontSize: 30 }} />
-            <TextInput
-              style={styles.fileInput}
-              placeholder="Chọn ảnh"
-              onChangeText={(value) => handleOnChangeInput(value, "image")}
-            />
+            <Text style={styles.label}>
+              <FontAwesomeIcon icon={faImages} /> Ảnh
+            </Text>
+            <Button title="Chọn ảnh" onPress={handleImagePicker} />
+            {formData.image && <Image source={{ uri: imageUri }} style={styles.image} />}
           </View>
         </View>
       </ScrollView>
       <View style={styles.modalFooter}>
-        <Button title="Đăng bài" onPress={handleAddNewPost} />
-        <Button title="Hủy" onPress={() => navigation.navigate('MainClubPage', {id, idclubmem})}/>
+          <TouchableOpacity style={styles.button} onPress={handleAddNewPost}>
+            <Text style={styles.buttonText}>Đăng bài</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MainClubPage', {id, idclubmem})}>
+            <Text style={styles.buttonText}>Hủy</Text>
+          </TouchableOpacity>
       </View>
     </View>
   );
@@ -251,50 +284,64 @@ function CreatePostPage() {
 
 const styles = StyleSheet.create({
   modalContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  modalHeader: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  modalBody: {
-    flex: 1,
-  },
-  formGroup: {
-    marginVertical: 10,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  textArea: {
-    height: 80,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    textAlignVertical: "top",
-  },
-  fileInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  modalFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-});
+      flex: 1,
+      padding: 20,
+      backgroundColor: "#fff",
+    },
+    modalHeader: {
+      fontSize: 20,
+      fontWeight: "bold",
+    },
+    modalBody: {
+      flex: 1,
+    },
+    formGroup: {
+      marginVertical: 10,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    input: {
+      height: 40,
+      borderColor: "gray",
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      paddingTop: 8,
+      fontSize: 16
+    },
+    textArea: {
+      height: 80,
+      borderColor: "gray",
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      textAlignVertical: "top",
+      fontSize: 16
+    },
+    fileInput: {
+      height: 40,
+      borderColor: "gray",
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+    },
+    modalFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    button: {
+        backgroundColor: "#4CAF50",
+        padding: 10,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+    },
+  });
 
 export default CreatePostPage;

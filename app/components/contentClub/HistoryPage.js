@@ -42,14 +42,7 @@ function HistoryPage() {
         const lastTransaction = response2.result.find(
           (item) => item.status && item.status.data && item.status.data[0] === 1
         );
-        if (lastTransaction) {
-          const resultPoint =
-            lastTransaction.initialPoint + lastTransaction.transactionPoint;
-          setWalletInfo((prevWalletInfo) => ({
-            ...prevWalletInfo,
-            point: resultPoint,
-          }));
-        }
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching wallet info:", error);

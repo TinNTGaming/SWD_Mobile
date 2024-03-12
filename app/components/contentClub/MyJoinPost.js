@@ -186,16 +186,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   clubTitleNewFeed: {
-    marginLeft: 60,
     height: 51,
     position: "fixed",
     backgroundColor: "#e8eee7",
-    padding: "5px 40px",
     borderRadius: 5,
-    width: "70%",
-    color: "#fff",
+    width: "100%",
+    color: "black",
     fontWeight: "700",
     fontSize: 24,
+    marginTop: 10,
+    marginBottom: 10,
+    textAlign: 'center',
+    marginLeft: 37,
+    padding: 10
   },
   loadingIcon: {
     marginTop: 20,

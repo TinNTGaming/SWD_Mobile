@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
 import {
-  getDetailClub,
-  getPostInClub,
   UserJointSlot,
-  getTranPoint,
-  getSlotJoined,
   getNumberOfSlot,
-  getWalletByMemberId,
-  getYardDetail } from "../../../services/userService";
+  getSlotNotJoined
+  } from "../../../services/userService";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CountdownTimer from '../CountdownTime';
 
-function NewFeed() {
+function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
   const route = useRoute();
   const id = route.params.id;
   const idclubmem = route.params.idclubmem;
@@ -35,45 +32,36 @@ function NewFeed() {
     fetchData();
   }, []);
 
-  const [clubDetail, setClubDetail] = useState({});
-  const [slotsInClub, setSlotsInClub] = useState([]);
-  const [tranPoint, setTranPoint] = useState(null);
   const [numberOfSlot, setNumberOfSlot] = useState({});
-  const [slotJoined, setSlotJoined] = useState([]);
-  const [inforWallet, setInforWallet] = useState({});
+  const [slotNotJoined, setSlotNotJoined] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [yardDetails, setYardDetails] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (userInfoLoaded && userInfo) {
         try {
-          const [clubDetailRes, slotsInClubRes, slotJoinedRes, tranPointRes] = await Promise.all([
-            getDetailClub(id),
-            getPostInClub(id),
-            getSlotJoined(idclubmem),
-            getTranPoint()
+          const [slotNotJoinedRes] = await Promise.all([
+            getSlotNotJoined(idclubmem, id)
           ]);
 
-          setTranPoint(tranPointRes.result);
-          setClubDetail(clubDetailRes.result);
-          setSlotsInClub(slotsInClubRes.result);
-          setSlotJoined(slotJoinedRes.result);
+          const slotNotJoinFitler = slotNotJoinedRes.result.filter((item) => {
+              return (
+                item.memberPostId != idclubmem &&
+                !isPassTime(item.date, item.startTime)
+              );
+            });
+          setSlotNotJoined(slotNotJoinFitler);
 
-          const promises = slotsInClubRes.result.map(async (item) => {
+          const promises = slotNotJoinedRes.result.map(async (item) => {
             const response = await getNumberOfSlot(item.id);
             return { itemId: item.id, numberOfSlot: response.result };
           });
-
           const results = await Promise.all(promises);
           const numberOfSlotMap = {};
           results.forEach((result) => {
             numberOfSlotMap[result.itemId] = result.numberOfSlot;
           });
           setNumberOfSlot(numberOfSlotMap);
-
-          const walletRes = await getWalletByMemberId(userInfo.id);
-          setInforWallet(walletRes.result);
 
           setIsLoading(false);
         } catch (error) {
@@ -85,14 +73,17 @@ function NewFeed() {
     fetchData();
   }, [userInfoLoaded, userInfo]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const details = await Promise.all(slotsInClub.map((item) => getYardDetail(item.yardId)));
-      setYardDetails(details);
-    };
+  function isPassTime(date, hour) {
+      const time = date + "T" + hour + ":00";
+      const targetTime = new Date(time).getTime();
+      const currentTime = new Date().getTime();
 
-    fetchData();
-  }, [slotsInClub]);
+      if (targetTime < currentTime) {
+        return true;
+      } else {
+        false;
+      }
+    }
 
   async function handleJoinSlot(slotId) {
     try {
@@ -105,11 +96,9 @@ function NewFeed() {
           transactionPoint: tranPoint.point,
         },
       });
-
-      // Refresh page
-      fetchData();
+      alert('Tham gia thành công!');
+      setActiveTab("myJoinPost")
     } catch (error) {
-      // showErrorToast("Error joining slot!");
       console.error("Error joining slot:", error);
     }
   }
@@ -130,22 +119,9 @@ function NewFeed() {
       <ScrollView>
       {isLoading && <ActivityIndicator style={styles.loadingIcon} size="large" color="#0000ff" />}
 
-      {slotsInClub.map((item, index) => {
-        if (item.memberPostId == idclubmem) {
-          return null;
-        }
-
-        const isJoined = slotJoined.some((joinedSlot) => joinedSlot.slotId === item.id);
-
-        if (isJoined) return null;
+      {slotNotJoined.map((item, index) => {
 
         const time = item.date + "T" + item.startTime + ":00";
-        const targetTime = new Date(time).getTime();
-        const currentTime = new Date().getTime();
-
-        if (targetTime < currentTime) {
-          return null;
-        }
 
         const date = new Date(item.dateTime);
 
@@ -158,36 +134,35 @@ function NewFeed() {
 
         const remainingSlots = parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0);
         const isFull = remainingSlots <= 0;
+        const yardDetails = yards.find((yard) => {
+          return yard.id === item.yardId;
+        });
 
         return (
-
           <View key={item.id} style={styles.mainPostContainer}>
             <View style={styles.posterName}>
               <Text>{item.memberPostName}</Text>
               <Text>{timePost}</Text>
             </View>
+            <Text><CountdownTimer targetTime={time} /></Text>
             <Text style={styles.caption}>{item.description}</Text>
             <View style={styles.postContentContainer}>
               <Image source={{uri: item.image}} style={styles.postImg} />
               <View style={styles.postInfo}>
                 <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
-                <Text>Khu: {yardDetails[index]?.result.areaName}</Text>
-                <Text>Sân: {yardDetails[index]?.result.sportName} - {item.yardName}</Text>
+                <Text>Khu: {yardDetails?.areaName}</Text>
+                <Text>Sân: {yardDetails?.sportName} - {item.yardName}</Text>
                 <Text>Thời gian: {item.startTime} - {item.endTime}</Text>
                 <Text>Date: {item.date}</Text>
                 <Text>Tổng số người chơi: {parseInt(item.requiredMember) + parseInt(item.currentMember)}</Text>
-                <Text>Còn: {parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0)}</Text>
+                <Text>Còn thiếu: {parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0)} người</Text>
                 {isFull ? (
                   <TouchableOpacity style={[styles.btnJoin, {backgroundColor: 'gray'}]} disabled>
-                    <Text>Full</Text>
-                  </TouchableOpacity>
-                ) : isJoined ? (
-                  <TouchableOpacity style={styles.btnJoin} disabled>
-                    <Text>Joined</Text>
+                    <Text>Đã đủ người</Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity style={styles.btnJoin} onPress={() => handleJoinSlot(item.id)}>
-                    <Text>Join</Text>
+                    <Text>Tham gia</Text>
                   </TouchableOpacity>
                   )}
                   </View>
@@ -197,9 +172,7 @@ function NewFeed() {
           })}
           </ScrollView>
         </View>
-
       );
-
     }
 
 const styles = StyleSheet.create({
