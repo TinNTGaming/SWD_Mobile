@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
   clubTitleNewFeed: {
     marginLeft: 60,
     height: 51,
-    position: "fixed",
+    position: "relative",
     backgroundColor: "#e8eee7",
     borderRadius: 5,
     width: "70%",

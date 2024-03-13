@@ -83,17 +83,22 @@ const MainClubPage = () => {
   return (
     <View style={styles.mainClubContainer}>
       <View style={styles.sideBarMain}>
+
         <TouchableOpacity style={styles.tabBtn} onPress={() => navigation.navigate('MemberPage')}>
-          <FontAwesomeIcon icon={faHome} />
-          <Text>Home</Text>
+            <View>
+                <FontAwesomeIcon icon={faHome}/>
+            </View>
+            <Text style={styles.text}>Trang chủ</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.tabBtn, activeTab === "newFeed" && styles.activeTab]}
           onPress={() => handleTabClick("newFeed")}
         >
-          <FontAwesomeIcon icon={faNewspaper} />
-          <Text>New feed</Text>
+          <View style={styles.icon}>
+            <FontAwesomeIcon icon={faNewspaper} />
+          </View>
+          <Text style={styles.text}>Bảng tin</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -101,7 +106,7 @@ const MainClubPage = () => {
           onPress={() => handleTabClick("myPost")}
         >
           <FontAwesomeIcon icon={faEnvelope} />
-          <Text>My posted</Text>
+          <Text style={styles.text}>Bài đăng của tôi</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -109,7 +114,7 @@ const MainClubPage = () => {
           onPress={() => handleTabClick("myJoinPost")}
         >
           <FontAwesomeIcon icon={faEnvelope} />
-          <Text>Posts joined</Text>
+          <Text style={styles.text}>Bài đăng tham gia</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -117,7 +122,7 @@ const MainClubPage = () => {
           onPress={() => handleTabClick("myHistory")}
         >
           <FontAwesomeIcon icon={faEnvelope} />
-          <Text>History</Text>
+          <Text style={styles.text}>Ví</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.contentContainer}>
@@ -156,13 +161,14 @@ const styles = StyleSheet.create({
     borderTopColor: "#e9e1e1",
   },
   tabBtn: {
+    flex:1,
     width: "20%",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    fontWeight: "bold",
-    textAlign: "center",
+    paddingVertical: 5,
+    paddingHorizontal: 5,
     borderBottomWidth: 1,
     borderBottomColor: "#e9e1e1",
+    justifyContent:'center',
+    alignItems:'center',
   },
   tabBtnText: {
     fontWeight: "bold",
@@ -174,6 +180,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  text:{
+    textAlign: 'center',
+    fontWeight: "bold",
+  }
 });
 
 export default MainClubPage;

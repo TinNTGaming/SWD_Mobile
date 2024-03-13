@@ -27,7 +27,7 @@ function ClubContent() {
   return (
     <View style={styles.containerClub1}>
       <View style={styles.line}></View>
-      <Text style={styles.clubTitle}>Sport clubs</Text>
+      <Text style={styles.clubTitle}>Các câu lạc bộ thể thao</Text>
       <ScrollView horizontal={false}>
       <View style={styles.contentMiddle}>            
         {clubs &&

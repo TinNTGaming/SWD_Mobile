@@ -14,7 +14,7 @@ function HomeContent() {
           <Image source={image} style={styles.headerImage} />
         </View>
         <View style={styles.contentDown}>
-          <Text style={styles.content1}>What is this website used for?</Text>
+          <Text style={styles.content1}>Giới thiệu về trang web</Text>
           <Text style={styles.content2}>
             Hiện nay, tại các tòa chung cư Vinhome có các sân thể thao như cầu lông, bóng rổ, bóng đá. Khi mọi người muốn dùng các sân này cần phải đặt trước để giữ chỗ. Nhưng vì người sử dụng đông nên đôi lúc việc đặt sân rất khó khăn.
           </Text>

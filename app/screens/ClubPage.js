@@ -143,7 +143,7 @@ const ClubPage = () => {
           </TouchableOpacity>
         )}
       </View>
-      <View style={styles.mainClub}>
+      <View>
       <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}> 
         <Text style={styles.btn}>Quay Lại</Text>
       </TouchableOpacity>
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   containerClub: {
     flex: 1,
     backgroundColor: '#FEF7F7',
-    padding: 10,
+    padding: 100,
   },
   clubHeader: {
     flex: 1,
@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingTop: 20,
     margin: 0,
+    textAlign:'center'
   },
   btn: {
     padding: 10,

@@ -110,7 +110,7 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
         <TouchableOpacity style={styles.postContainer} onPress={() => navigation.navigate('CreatePostPage', { clubDetail, idclubmem })}>
         <Image source={userInfo && userInfo.image ? { uri: userInfo.image } : null} style={styles.avatar} />
         <Text style={styles.writeBtn}>
-          <Text>{userInfo ? userInfo.name : 'Guest'} ơi</Text>
+          <Text>{userInfo ? userInfo.name : 'Guest'} ơi! </Text>
           <Text style={{ marginLeft: 5 }}>Bạn đang muốn gì thế?</Text>
         </Text>
       </TouchableOpacity>

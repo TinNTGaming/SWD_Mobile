@@ -53,7 +53,7 @@ function HeaderMember() {
               onPress={() => handleTabClick('home')}
             >
               <Text style={styles.active}>
-                <Text style={{ fontWeight: 'bold' }}>Home</Text>
+                <Text style={{ fontWeight: 'bold' }}>Trang chủ</Text>
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -61,7 +61,7 @@ function HeaderMember() {
               onPress={() => handleTabClick('club')}
             >
               <Text style={styles.active}>
-                <Text style={{ fontWeight: 'bold' }}>Club</Text>
+                <Text style={{ fontWeight: 'bold' }}>Câu lạc bộ</Text>
               </Text>
             </TouchableOpacity>
             <View style={styles.childContent}>
@@ -70,7 +70,7 @@ function HeaderMember() {
                 onPress={() => handleTabClick('contact')}
               >
                 <Text style={styles.active}>
-                  <Text style={{ fontWeight: 'bold' }}>Contact</Text>
+                  <Text style={{ fontWeight: 'bold' }}>Hướng dẫn</Text>
                 </Text>
               </TouchableOpacity>
             </View>
@@ -79,7 +79,7 @@ function HeaderMember() {
         <View style={styles.contentRight}>
         <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
           <View style={styles.headerUserInfo}>
-            <Text style={{ fontSize: 13, fontWeight: '300', textTransform: 'uppercase' }}>
+            <Text style={{ fontSize: 15, fontWeight: 'bold', textTransform: 'uppercase' }}>
               {userInfo.name}
             </Text>
           </View>
@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
     },
     middle: {
       flex: 1,
-      marginLeft: 10,
     },
     contentMiddle: {
       flexDirection: 'row',
@@ -138,7 +137,7 @@ const styles = StyleSheet.create({
     },
     active: {
       color: '#5cbb50',
-      fontSize: 18,
+      fontSize: 15,
     },
     contentRight: {
       marginLeft: 20,
@@ -166,15 +165,15 @@ const styles = StyleSheet.create({
     dropdown: {
         position: 'absolute',
         top: 70,
-        right: 10,
-        backgroundColor: '#fff',
+        right: 0,
+        backgroundColor: 'grey',
         borderRadius: 5,
         padding: 10,
         zIndex: 1001,
       },
       logoutText: {
         fontSize: 13,
-        fontWeight: '300',
+        fontWeight: 'bold',
         textTransform: 'uppercase',
         color: 'red',
       }
