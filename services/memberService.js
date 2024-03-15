@@ -26,8 +26,8 @@ const getListMemberJoinPost = (idSlot) => {
     return axios.get(`api/clubMembers/${idSlot}/getbyslotid`);
 }
 
-const confirmNoJoining = (clubMemSlotId) => {
-    return axios.put(`api/clubMemSlots/${clubMemSlotId}/confirmNoJoining`);
+const confirmNoJoining = (clubMemberId, slotId) => {
+    return axios.put(`api/clubMemSlots/${clubMemberId}/${slotId}/confirmNoJoining`);
 }
 
 const confirmJoining = (clubMemberId, slotId, data) => {

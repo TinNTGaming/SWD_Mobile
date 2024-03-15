@@ -173,9 +173,15 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                     <Text>{item.memberPostName}</Text>
                     <Text>{timePost}</Text>
                   </View>
+                  {!isPassTime ? (
                   <View>
                     <CountdownTimer targetTime={time} />
                   </View>
+                  ) : (
+                  <View>
+                      <Text style={{fontSize: 16, fontWeight: "bold"}}>Kết thúc trận đấu</Text>
+                  </View>
+                  )}
                 </View>
 
                 <Text style={styles.caption}>{item.description}</Text>
@@ -183,7 +189,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                 <View style={styles.postContentContainer}>
                   <Image style={styles.postImg} source={{ uri: item.image }} />
                   <View style={styles.postInfo}>
-                    <Text style={styles.infoText}>Thông tin trận đấu</Text>
+                    <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
                     <View>
                       <Text>Khu: <Text style={styles.boldText}>{yardDetails?.areaName}</Text></Text>
                       <Text>Sân: <Text style={styles.boldText}>{yardDetails?.sportName} - {item.yardName}</Text></Text>
@@ -214,13 +220,12 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                 <View key={member.id} style={styles.memberItem}>
                                   <Text>{member.memberName}</Text>
                                   <View>
-                                    {postItem.status.map((status) => {
+                                    {isPassTime && postItem.status.map((status) => {
                                       if (status.clubMemberId === member.id) {
                                         if (status.joinStatus === "joined") {
                                           return (
                                             <View key={`${member.id}-joined`} style={styles.confirmButtons}>
                                               <TouchableOpacity
-                                                style={styles.confirmButton}
                                                 onPress={() =>
                                                   handleConfirmJoin(
                                                     member.id,
@@ -229,10 +234,9 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                                   )
                                                 }
                                               >
-                                                <Text style={styles.buttonText}>Xác nhận đã tham gia</Text>
+                                                <Text style={styles.confirmButton}>Xác nhận đã tham gia</Text>
                                               </TouchableOpacity>
                                               <TouchableOpacity
-                                                style={styles.cancelButton}
                                                 onPress={() =>
                                                   handleCancelJoin(
                                                     member.id,
@@ -240,7 +244,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                                   )
                                                 }
                                               >
-                                                <Text style={styles.buttonText}>Xác nhận không tham gia</Text>
+                                                <Text style={styles.cancelButton}>Xác nhận không tham gia</Text>
                                               </TouchableOpacity>
                                             </View>
                                           );
@@ -269,7 +273,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                 </View>
                               ))
                             ) : (
-                              <Text>Chưa có người chơi nào tham gia.</Text>
+                              <Text key="empty">Chưa có người chơi nào tham gia.</Text>
                             )}
                           </View>
                         ))}
@@ -342,64 +346,40 @@ const styles = StyleSheet.create({
     marginLeft: 60,
   },
   mainPostContainer: {
-    height: "auto",
-    padding: 20,
-    width: "90%",
-    backgroundColor: "white",
-    margin: "50px auto",
-    borderRadius: 10,
-    shadowColor: "#ccc",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
     borderWidth: 1,
     borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 16,
+    marginLeft:10,
+    marginRight: 10
   },
   posterName: {
-    display: "flex",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    width: "100%",
-    padding: 10,
-    marginBottom: 10,
-  },
-  p: {
-    margin: 0,
-    fontWeight: "bold",
-    fontSize: 24,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 8,
   },
   caption: {
     fontSize: 20,
-    marginBottom: 20,
-    marginLeft: 30,
+    marginBottom: 8,
   },
   postContentContainer: {
-    marginLeft: 30,
     display: "flex",
+    flexDirection: "row",
   },
   postImg: {
-    width: "16%",
-    height: 50,
-    borderRadius: 25,
-    overflow: "hidden",
-    marginRight: 20,
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    marginRight: 16,
   },
   postInfor: {
-    paddingLeft: 50,
-    width: "auto",
-    textAlign: "left",
-    backgroundColor: "white",
-    marginLeft: 20,
-    borderWidth: 1,
-    borderColor: "#bebaba",
-    paddingBottom: 10,
-    display: "flex",
-    flexDirection: "column",
+    flex: 1,
   },
-  h3: {
-    marginBottom: 20,
-    fontWeight: "bold",
+  postInfoText: {
+      fontSize: 16,
+      fontWeight: "bold",
+      marginBottom: 8,
   },
   btnJoin: {
     padding: "10px 50px",
@@ -410,48 +390,47 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
   },
-  b: {
-    fontSize: 24,
-    fontWeight: "400",
-  },
-  confirm: {
-    width: 50,
-    border: "none",
-    outline: "none",
-    backgroundColor: "transparent",
-    color: "orange",
-    fontSize: 18,
+  confirmButtons:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   confirmButton: {
-    border: "none",
-    borderRadius: 4,
-    padding: "8px 16px",
-    marginRight: 8,
+    padding: 10,
+    margin: 5,
     backgroundColor: "#4caf50",
     color: "white",
+    borderRadius: 5,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   cancelButton: {
-    border: "none",
-    borderRadius: 4,
-    padding: "8px 16px",
-    marginRight: 8,
+    padding: 10,
+    margin: 5,
     backgroundColor: "#f44336",
     color: "white",
+    borderRadius: 5,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   btnConfirm: {
-    backgroundColor: 'green',
-    width: 80,
-    paddingBottom: 5,
-    paddingTop: 5,
+    backgroundColor: "#4caf50",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
   },
   confirmText: {
     color: 'white',
   },
   btnCancel: {
-    backgroundColor: 'red',
-    width: 100,
-    paddingBottom: 5,
-    paddingTop: 5,
+    backgroundColor: "#f44336",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
   },
   cancelText: {
     color: 'white',

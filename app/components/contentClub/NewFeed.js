@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
       },
       caption: {
         marginBottom: 8,
+        fontSize: 20
       },
       postContentContainer: {
         flexDirection: "row",

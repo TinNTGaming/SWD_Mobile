@@ -6,6 +6,7 @@ import ClubContent from './contentMember/ClubContent';
 import Contact from '../components/FooterMember';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Avatar from "../assets/avatar/no-avatar.png";
 
 function HeaderMember() {
 
@@ -38,6 +39,15 @@ function HeaderMember() {
          } catch(e) {
            console.log(e);
          }
+   };
+
+   const isValidUri = (uri) => {
+     try {
+       new URL(uri);
+       return true;
+     } catch (error) {
+       return false;
+     }
    };
 
   getLoginInfo();
@@ -79,15 +89,17 @@ function HeaderMember() {
         <View style={styles.contentRight}>
         <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
           <View style={styles.headerUserInfo}>
-            <Text style={{ fontSize: 15, fontWeight: 'bold', textTransform: 'uppercase' }}>
-              {userInfo.name}
-            </Text>
+            <Image
+              source={userInfo.image && typeof userInfo.image === 'string' && isValidUri(userInfo.image) ? { uri: userInfo.image } : Avatar}
+              style={styles.headerImage}
+            />
           </View>
           </TouchableOpacity>
         </View>
       </View>
       {showDropdown && (
               <View style={styles.dropdown}>
+                <Text style={styles.headerUserInfo}>{userInfo.name}</Text>
                 <TouchableOpacity onPress={handleLogout}>
                   <Text style={styles.logoutText}>Đăng xuất</Text>
                 </TouchableOpacity>
@@ -145,16 +157,16 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
     },
-    // headerImage: {
-    //   backgroundSize: 'cover',
-    //   width: 50,
-    //   height: 50,
-    //   borderRadius: 25,
-    //   overflow: 'hidden',
-    // },
+     headerImage: {
+       resizeMode: 'cover',
+       width: 30,
+       height: 30,
+       borderRadius: 25,
+       overflow: 'hidden',
+     },
     headerUserInfo: {
-      fontSize: 5,
-      fontWeight: '10',
+      fontSize: 20,
+      fontWeight: 'bold',
       textTransform: 'uppercase',
     },
     content:{
@@ -165,14 +177,14 @@ const styles = StyleSheet.create({
     dropdown: {
         position: 'absolute',
         top: 70,
-        right: 0,
+        right: 5,
         backgroundColor: 'grey',
         borderRadius: 5,
         padding: 10,
         zIndex: 1001,
       },
       logoutText: {
-        fontSize: 13,
+        fontSize: 18,
         fontWeight: 'bold',
         textTransform: 'uppercase',
         color: 'red',
