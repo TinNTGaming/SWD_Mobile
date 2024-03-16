@@ -63,7 +63,7 @@ function HeaderMember() {
               onPress={() => handleTabClick('home')}
             >
               <Text style={styles.active}>
-                <Text style={{ fontWeight: 'bold' }}>Trang chủ</Text>
+                <Text style={styles.text}>Trang chủ</Text>
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -71,7 +71,7 @@ function HeaderMember() {
               onPress={() => handleTabClick('club')}
             >
               <Text style={styles.active}>
-                <Text style={{ fontWeight: 'bold' }}>Câu lạc bộ</Text>
+                <Text style={styles.text}>Câu lạc bộ</Text>
               </Text>
             </TouchableOpacity>
             <View style={styles.childContent}>
@@ -80,7 +80,7 @@ function HeaderMember() {
                 onPress={() => handleTabClick('contact')}
               >
                 <Text style={styles.active}>
-                  <Text style={{ fontWeight: 'bold' }}>Hướng dẫn</Text>
+                  <Text style={styles.text}>Hướng dẫn</Text>
                 </Text>
               </TouchableOpacity>
             </View>
@@ -116,12 +116,12 @@ function HeaderMember() {
 };
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    flexDirection: 'column',
+      flex: 1,
+      flexDirection: 'column',
     },
     header: {
       flexDirection: 'row',
-      height: 70,
+      height: 80,
       position: 'absolute',
       top: 0,
       left: 0,
@@ -129,11 +129,13 @@ const styles = StyleSheet.create({
       zIndex: 1000,
       backgroundColor: '#fff',
       alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: "black",
       paddingTop: 30,
     },
     headerLogo: {
       height: '50%',
-      width: '20%',
+      width: '16%',
       resizeMode: 'cover',
     },
     middle: {
@@ -149,10 +151,9 @@ const styles = StyleSheet.create({
     },
     active: {
       color: '#5cbb50',
-      fontSize: 15,
     },
     contentRight: {
-      marginLeft: 20,
+      marginLeft: 10,
       marginRight: 10,
       flexDirection: 'row',
       alignItems: 'center',
@@ -171,14 +172,14 @@ const styles = StyleSheet.create({
     },
     content:{
       flex: 1,
-      marginTop: 70
+      marginTop: 80
     },
 
     dropdown: {
         position: 'absolute',
         top: 70,
         right: 5,
-        backgroundColor: 'grey',
+        backgroundColor: 'rgba(169,169,169, 0.9)',
         borderRadius: 5,
         padding: 10,
         zIndex: 1001,
@@ -188,6 +189,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textTransform: 'uppercase',
         color: 'red',
+      },
+      text:{
+        fontSize: 18,
+        fontWeight: "bold",
       }
   });
 export default HeaderMember;

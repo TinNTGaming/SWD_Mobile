@@ -3,7 +3,7 @@ import axios from 'axios';
 import _ from 'lodash';
 
 const instance = axios.create({
-  baseURL: 'http://26.246.163.25:3000',
+  baseURL: 'https://swd-be.onrender.com',
     // withCredentials: true
 });
 

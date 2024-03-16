@@ -56,26 +56,26 @@ const ClubPage = () => {
     });
 
     setIsJoined(true);
-    alert("Join Club Success");
+    alert("Tham gia thành công");
     setClubDetail((prevClubDetail) => ({
       ...prevClubDetail,
       countMember: prevClubDetail.countMember + 1,
     }));
 
-    // navigation.navigate("YourNextScreen"); // Replace with your desired navigation destination
+    navigation.navigate('MainClubPage', { id: clubDetail.id, idclubmem: memberCreatePostId })
   };
 
   const handleLeaveClub = async () => {
     Alert.alert(
-      "Confirm",
+      "Xác nhận",
       "Bạn có chắc chắn muốn rời club?",
       [
         {
-          text: "Cancel",
+          text: "Hủy",
           style: "cancel",
         },
         {
-          text: "OK",
+          text: "Đồng ý",
           onPress: async () => {
             await MemberLeavingClub({
               memberId: userInfo.id,

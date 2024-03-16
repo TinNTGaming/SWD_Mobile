@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, ScrollView, Modal } from "react-native";
 import {
   UserJointSlot,
   getNumberOfSlot,
@@ -101,7 +101,20 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
     } catch (error) {
       console.error("Error joining slot:", error);
     }
-  }
+  };
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImagePress = (imageUri) => {
+    setSelectedImage(imageUri);
+    setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setIsModalVisible(false);
+    setSelectedImage(null);
+  };
 
   return (
     <View style={styles.container}>
@@ -141,28 +154,34 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
         return (
           <View key={item.id} style={styles.mainPostContainer}>
             <View style={styles.posterName}>
-              <Text>{item.memberPostName}</Text>
-              <Text>{timePost}</Text>
+                <View>
+                  <Text>{item.memberPostName}</Text>
+                  <Text>{timePost}</Text>
+                </View>
+                <View>
+                  <Text><CountdownTimer targetTime={time} /></Text>
+                </View>
             </View>
-            <Text><CountdownTimer targetTime={time} /></Text>
             <Text style={styles.caption}>{item.description}</Text>
             <View style={styles.postContentContainer}>
-              <Image source={{uri: item.image}} style={styles.postImg} />
+              <TouchableOpacity style={styles.postImg} onPress={() => handleImagePress(item.image)}>
+                <Image source={{uri: item.image}} style={styles.postImg} />
+              </TouchableOpacity>
               <View style={styles.postInfo}>
                 <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
-                <Text>Khu: {yardDetails?.areaName}</Text>
-                <Text>Sân: {yardDetails?.sportName} - {item.yardName}</Text>
-                <Text>Thời gian: {item.startTime} - {item.endTime}</Text>
-                <Text>Date: {item.date}</Text>
-                <Text>Tổng số người chơi: {parseInt(item.requiredMember) + parseInt(item.currentMember)}</Text>
-                <Text>Còn thiếu: {parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0)} người</Text>
+                <Text>Khu: <Text style={styles.boldText}>{yardDetails?.areaName}</Text></Text>
+                <Text>Sân: <Text style={styles.boldText}>{yardDetails?.sportName} - {item.yardName}</Text></Text>
+                <Text>Thời gian: <Text style={styles.boldText}>{item.startTime} - {item.endTime}</Text></Text>
+                <Text>Date: <Text style={styles.boldText}>{item.date}</Text></Text>
+                <Text>Tổng số người chơi: <Text style={styles.boldText}>{parseInt(item.requiredMember) + parseInt(item.currentMember)}</Text></Text>
+                <Text>Còn thiếu: <Text style={styles.boldText}>{parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0)} người</Text></Text>
                 {isFull ? (
                   <TouchableOpacity style={[styles.btnJoin, {backgroundColor: 'gray'}]} disabled>
-                    <Text>Đã đủ người</Text>
+                    <Text style={styles.boldText}>Đã đủ người</Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity style={styles.btnJoin} onPress={() => handleJoinSlot(item.id)}>
-                    <Text>Tham gia</Text>
+                    <Text style={{color: 'white', fontSize: 15}}>Tham gia</Text>
                   </TouchableOpacity>
                   )}
                   </View>
@@ -171,6 +190,14 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
             );
           })}
           </ScrollView>
+          <Modal visible={isModalVisible} transparent={true} animationType="slide">
+              <View style={styles.modalContainer}>
+                <Image style={styles.modalImage} source={{ uri: selectedImage }} />
+                <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                    <Text style={styles.closeButtonText}>Đóng</Text>
+                </TouchableOpacity>
+              </View>
+          </Modal>
         </View>
       );
     }
@@ -179,13 +206,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-      },
-      clubTitle:{
+    },
+    clubTitle:{
         fontSize: 30,
         fontWeight: "bold",
         textAlign: 'center'
-      },
-      clubTitleNewFeed: {
+    },
+    clubTitleNewFeed: {
         marginLeft: "15%",
         height: 44,
         position: "absolute",
@@ -194,69 +221,96 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         width: "70%",
         color: "#fff",
-      },
-      postContainer: {
+    },
+    postContainer: {
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 16,
-      },
-      avatar: {
+    },
+    avatar: {
         width: 50,
         height: 50,
         borderRadius: 25,
-      },
-      writeBtn: {
+    },
+    writeBtn: {
         marginLeft: 10,
-      },
-      sectionTitle: {
+    },
+    sectionTitle: {
         fontSize: 20,
         fontWeight: "bold",
         marginBottom: 10,
-      },
-      loadingIcon: {
+    },
+    loadingIcon: {
         marginTop: 20,
-      },
-      mainPostContainer: {
+    },
+    mainPostContainer: {
         borderWidth: 1,
         borderColor: "#ccc",
         borderRadius: 10,
         padding: 16,
         marginBottom: 16,
       },
-      posterName: {
+    posterName: {
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 8,
-      },
-      caption: {
+    },
+    caption: {
         marginBottom: 8,
         fontSize: 20
-      },
-      postContentContainer: {
+    },
+    postContentContainer: {
         flexDirection: "row",
-      },
-      postImg: {
-        width: 80,
-        height: 80,
-        borderRadius: 10,
-        marginRight: 16,
-      },
-      postInfo: {
-        flex: 1,
-      },
-      postInfoText: {
+        display: "flex",
+    },
+    postImg: {
+        flex: 3,
+        resizeMode: "contain",
+        borderRadius: 5,
+        marginRight: 10
+    },
+    postInfo: {
+        flex: 4,
+    },
+    postInfoText: {
         fontSize: 16,
         fontWeight: "bold",
         marginBottom: 8,
-      },
-      btnJoin: {
+    },
+    btnJoin: {
         backgroundColor: "green",
         padding: 10,
         borderRadius: 5,
         alignItems: "center",
         justifyContent: "center",
         marginTop: 10,
-      },
+    },
+    boldText:{
+        fontWeight: "bold",
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+    },
+    modalImage: {
+        width: "80%",
+        height: "80%",
+        resizeMode: "contain",
+    },
+    closeButton: {
+        position: "absolute",
+        top: 20,
+        right: 20,
+        backgroundColor: "white",
+        padding: 10,
+        borderRadius: 5,
+    },
+    closeButtonText: {
+        color: "black",
+        fontWeight: "bold",
+    },
 });
 
 export default NewFeed;

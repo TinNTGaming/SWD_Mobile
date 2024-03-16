@@ -91,7 +91,7 @@ function CreatePostPage() {
   const handleImagePicker = async () => {
       const result = await launchImageLibrary();
       console.error('Test',result);
-      handleOnChangeInput(result.assets[0].uri, 'image');
+      handleOnChangeInput(result.assets.uri, 'image');
     };
 
   const uploadCloudinary = async (image) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView, Modal ,YellowBox} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -16,6 +16,8 @@ import {
 import CountdownTimer from "../CountdownTime";
 import { useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+console.disableYellowBox = true;
 
 function MyPost({ tranPoint, inforWallet, yards }) {
   const route = useRoute();
@@ -133,6 +135,19 @@ function MyPost({ tranPoint, inforWallet, yards }) {
     }
   };
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImagePress = (imageUri) => {
+      setSelectedImage(imageUri);
+      setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+      setIsModalVisible(false);
+      setSelectedImage(null);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.clubTitleNewFeed}>Bài viết của bạn</Text>
@@ -187,7 +202,9 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                 <Text style={styles.caption}>{item.description}</Text>
 
                 <View style={styles.postContentContainer}>
-                  <Image style={styles.postImg} source={{ uri: item.image }} />
+                  <TouchableOpacity style={styles.postImg} onPress={() => handleImagePress(item.image)}>
+                    <Image style={styles.postImg} source={{ uri: item.image }} />
+                  </TouchableOpacity>
                   <View style={styles.postInfo}>
                     <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
                     <View>
@@ -273,7 +290,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                 </View>
                               ))
                             ) : (
-                              <Text key="empty">Chưa có người chơi nào tham gia.</Text>
+                              <Text>Chưa có người chơi nào tham gia.</Text>
                             )}
                           </View>
                         ))}
@@ -286,17 +303,25 @@ function MyPost({ tranPoint, inforWallet, yards }) {
         </>
       )}
       </ScrollView>
+      <Modal visible={isModalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <Image style={styles.modalImage} source={{ uri: selectedImage }} />
+          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <Text style={styles.closeButtonText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  newFeedContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
+  container: {
+    flex: 1,
+    padding: 16,
   },
   clubTitleNewFeed: {
-    marginLeft: 60,
+    marginLeft: "15%",
     height: 51,
     position: "relative",
     backgroundColor: "#e8eee7",
@@ -305,45 +330,9 @@ const styles = StyleSheet.create({
     color: "black",
     fontWeight: "700",
     fontSize: 24,
-    marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 15,
     textAlign:'center',
     padding: 8
-  },
-  postContainer: {
-    margin: "50px auto 20px",
-    height: 126,
-    width: "80%",
-    backgroundColor: "white",
-    borderRadius: 10,
-    textAlign: "center",
-    padding: "30px 0",
-    shadowColor: "#ccc",
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    display: "flex",
-    justifyContent: "center",
-  },
-  postInput: {
-    borderRadius: 20,
-    width: "80%",
-    height: 50,
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "#d0cdcd",
-  },
-  postLine: {
-    width: "90%",
-    height: 2,
-    backgroundColor: "#d0cdcd",
-    margin: "0 auto",
-  },
-  h5: {
-    marginLeft: 60,
   },
   mainPostContainer: {
     borderWidth: 1,
@@ -351,8 +340,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 16,
     marginBottom: 16,
-    marginLeft:10,
-    marginRight: 10
   },
   posterName: {
       flexDirection: "row",
@@ -367,14 +354,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
   },
-  postImg: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    marginRight: 16,
+  postInfo: {
+    flex: 4,
   },
-  postInfor: {
-    flex: 1,
+  postImg: {
+    flex: 3,
+    resizeMode: "contain",
+    borderRadius: 5,
+    marginRight: 10
   },
   postInfoText: {
       fontSize: 16,
@@ -449,7 +436,33 @@ const styles = StyleSheet.create({
   },
   noPostsMessage: {
     fontSize: 18
-  }
+  },
+  modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  modalImage: {
+      width: "80%",
+      height: "80%",
+      resizeMode: "contain",
+  },
+  closeButton: {
+      position: "absolute",
+      top: 20,
+      right: 20,
+      backgroundColor: "white",
+      padding: 10,
+      borderRadius: 5,
+  },
+  closeButtonText: {
+      color: "black",
+      fontWeight: "bold",
+  },
+  boldText:{
+      fontWeight: "bold",
+  },
 });
 
 export default MyPost;
