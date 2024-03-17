@@ -127,7 +127,7 @@ const ClubPage = () => {
         <Text>Mô tả: {clubDetail.description}</Text>
         <Text>Ngày thành lập: {timePost}</Text>
         <Text>Người quản lí: {clubDetail.staffName}</Text>
-        
+
         {isJoined ? (
           <View>
             <TouchableOpacity onPress={() => navigation.navigate('MainClubPage', { id: clubDetail.id, idclubmem: memberCreatePostId })}>
@@ -136,17 +136,20 @@ const ClubPage = () => {
             <TouchableOpacity onPress={handleLeaveClub}>
               <Text style={[styles.btn, styles.leaveBtn]}>Muốn rời nhóm</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}>
+              <Text style={styles.btn}>Quay Lại</Text>
+            </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity onPress={handleJoinClub}>
-            <Text style={styles.btn}>Tham gia</Text>
-          </TouchableOpacity>
+          <View>
+            <TouchableOpacity onPress={handleJoinClub}>
+              <Text style={styles.btn}>Tham gia</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}>
+              <Text style={styles.btn}>Quay Lại</Text>
+            </TouchableOpacity>
+          </View>
         )}
-      </View>
-      <View>
-      <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}> 
-        <Text style={styles.btn}>Quay Lại</Text>
-      </TouchableOpacity>
       </View>
     </View>
   );
@@ -156,7 +159,7 @@ const styles = StyleSheet.create({
   containerClub: {
     flex: 1,
     backgroundColor: '#FEF7F7',
-    padding: 100,
+    padding: 50,
   },
   clubHeader: {
     flex: 1,

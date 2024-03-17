@@ -38,7 +38,7 @@ const LoginMember = ({navigation}) => {
         <View style={styles.loginContent}>
           <Text style={styles.textLogin}>Đăng nhập thành viên</Text>
           <View style={styles.loginInput}>
-            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.label}>Tài khoản:</Text>
             <TextInput
               style={styles.input}
               placeholder='Nhận email của bạn'

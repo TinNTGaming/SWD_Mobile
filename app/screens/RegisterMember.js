@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Button} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAllBuildingId } from "../../services/userService";
 import { registerMember } from "../../services/memberService";
-import * as ImagePicker from 'react-native-image-picker';
+import * as ImagePicker from 'expo-image-picker';
+import axios from '../../axios.js';
 
 const RegisterMember = ({navigation}) => {
+  const imageFile = useRef(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,8 +41,20 @@ const RegisterMember = ({navigation}) => {
     }
     setFormData({
         ...formData,
-        [id]: event.target.value,
+        [id]: event,
     });
+  };
+
+  const handleBuildingNameChange = (value) => {
+    const selectedBuildingName = value;
+    const selectedBuilding = buildingIds.find(building => building.name === selectedBuildingName);
+    if (selectedBuilding) {
+      setFormData({
+        ...formData,
+        buildingName: selectedBuilding.name,
+        buildingId: selectedBuilding.id
+      });
+    }
   };
 
   const uploadCloudinary = async (image) => {
@@ -68,7 +82,7 @@ const RegisterMember = ({navigation}) => {
     for (let i = 0; i < arrInput.length; i++) {
         if (!formData[arrInput[i]]) {
             isValid = false;
-            showErrorToast(`Missing parameter: ${arrInput[i]}`);
+            Alert(`Thiếu thông tin: ${arrInput[i]}`);
             break;
         }
     }
@@ -78,11 +92,10 @@ const RegisterMember = ({navigation}) => {
   const handleAddNewUser =  async() => {
     let isValid = checkValidateInput();
     if (isValid) {
-        //call api create modal
         console.log(formData);        
         try {
           await registerMember(formData)
-          alert('User added successfully!');     
+          alert('Đăng kí thành công!');
           navigation.navigate('LoginMember');
         } catch (error) {
           console.log(error);
@@ -99,41 +112,35 @@ const RegisterMember = ({navigation}) => {
             phoneNumber: '',
         });
 
-        toggle();
     }
     };
   
-    const handleImagePicker = () => {
-      const options = {
-        title: 'Chọn ảnh',
-        storageOptions: {
-          skipBackup: true,
-          path: 'images',
-        },
-      };
+  const handleImagePicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
-      ImagePicker.showImagePicker(options, (response) => {
-        if (response.didCancel) {
-          console.log('Người dùng hủy chọn ảnh');
-        } else if (response.error) {
-          console.log('Lỗi:', response.error);
-        } else {
-          // Lưu đường dẫn hình ảnh và hiển thị nó
-          formData.image = ({ uri: response.uri });                  
-        }
-      });
-    };
+    console.log(result);
+
+    if (!result.cancelled) {
+      handleOnChangeInput(result.assets.uri, 'image');
+    }
+  };
   
   return (
     <View style={styles.loginBackground}>
         <View style={styles.loginContainer}>
             <View style={styles.loginContent}>
-            <Text style={styles.textLogin}>Member Register</Text>
+            <ScrollView>
+            <Text style={styles.textLogin}>Tạo tài khoản</Text>
             <View style={styles.loginInput}>
-                <Text style={styles.label}>Username:</Text>
+                <Text style={styles.label}>Tên User:</Text>
                 <TextInput
                 style={styles.input}
-                placeholder='Enter your username'
+                placeholder='Nhập tên đăng nhập'
                 onChangeText={(event) => handleOnChangeInput(event, 'name')}
                 value={formData.name}
                 />        
@@ -142,84 +149,69 @@ const RegisterMember = ({navigation}) => {
                 <Text style={styles.label}>Email:</Text>
                 <TextInput
                 style={styles.input}
-                placeholder='Enter your email'
+                placeholder='Nhập email'
                 onChangeText={(event) => handleOnChangeInput(event, 'email')}
                 value={formData.email}
                 />        
             </View>
             <View style={styles.loginInput}>
-                <Text style={styles.label}>Password:</Text>
+                <Text style={styles.label}>Mật khẩu:</Text>
                 <TextInput
                 style={styles.input}
-                placeholder='Enter your password'
+                placeholder='Nhập password'
                 onChangeText={(event) => handleOnChangeInput(event, 'password')}
                 value={formData.password}
                 secureTextEntry            
                 />
             </View>                    
             <View style={styles.loginInput}>
-                <Text style={styles.label}>Gender:</Text>
-                <TextInput
-                style={styles.input}
-                placeholder='Enter your gender'
-                onChangeText={(event) => handleOnChangeInput(event, 'gender')}
-                value={formData.gender}
-                />        
+                <Text style={styles.label}>Giới tính:</Text>
+                <Picker
+                    selectedValue={formData.gender}
+                    onValueChange={(event) => handleOnChangeInput(event, 'gender')}
+                >
+                    <Picker.Item label='Chọn giới tính' value='' />
+                    <Picker.Item label='Nam' value='male' />
+                    <Picker.Item label='Nữ' value='female' />
+                    <Picker.Item label='Khác' value='other' />
+                </Picker>
             </View>    
             <View style={styles.loginInput}>
-                <Text style={styles.label}>Building Name:</Text>
+                <Text style={styles.label}>Tên tòa nhà:</Text>
                 <Picker 
                     selectedValue={formData.buildingname}
-                    onValueChange={(event) => handleOnChangeInput(event, 'buildingName')}
+                    onValueChange={(event) => handleBuildingNameChange (event)}
                 >
-                    <Picker.Item label='Select Building Name' value='' />
+                    <Picker.Item label='Chọn tên tòa nhà' value='' />
                     {buildingIds.map((buildingId) => (
-                      <Picker.Item label={buildingId.name} value={buildingId.name} />                                            
+                      <Picker.Item key={buildingId.id} label={buildingId.name} value={buildingId.name} />
                     ))}
                 </Picker>
             </View>
             <View style={styles.loginInput}>
-                <Text style={styles.label}>Building Id:</Text>
-                <Picker 
-                    selectedValue={formData.buildingid}
-                    onValueChange={(event) => handleOnChangeInput(event, 'buildingId')}
-                >
-                    <Picker.Item label='Select Building Id' value='' />
-                    {buildingIds.map((buildingId) => (
-                      <Picker.Item label={buildingId.id} value={buildingId.id} />                                            
-                    ))}
-                </Picker>
-            </View>      
-            <View style={styles.loginInput}>
-                <Text style={styles.label}>Phone Number:</Text>
+                <Text style={styles.label}>Số điện thoại:</Text>
                 <TextInput
                 style={styles.input}
-                placeholder='Enter your phone number'
+                placeholder='Nhập số điện thoại'
                 onChangeText={(event) => handleOnChangeInput(event, 'phoneNumber')}
                 value={formData.phonenumber}
                 />        
             </View> 
             <View style={styles.loginInput}>
-                <TouchableOpacity 
-                onPress={handleImagePicker} 
-                onValueChange={(event) => handleOnChangeInput(event, 'image')} 
-                >
-                  {formData.image ? (
-                  <Image source={formData.image} style={styles.image} onValueChange={(event) => handleOnChangeInput(event, 'image')}  />
-                  ) : (
-                    <Text style={styles.label}>Chọn ảnh</Text>
-                  )}
-                </TouchableOpacity>                
+                <Text style={styles.label}>Ảnh</Text>
+                <Button title="Chọn ảnh" onPress={handleImagePicker} />
+                {formData.image && <Image source={formData.image} style={styles.image} />}
             </View>
                 
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.btnLogin} onPress={handleAddNewUser}>
-                <Text style={styles.btnText}>Register</Text>
+                <Text style={styles.btnText}>Đăng kí</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('LoginMember')}>
-                <Text style={styles.btnText}>Close</Text>
+                <Text style={styles.btnText}>Đóng</Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
             </View>
         </View>
     </View>
@@ -236,7 +228,6 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     width: 400,
-    height: 800,
     borderRadius: 10,
     borderWidth: 1,
     borderStyle: 'dashed',

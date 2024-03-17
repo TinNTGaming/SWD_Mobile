@@ -38,12 +38,11 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (userInfoLoaded && userInfo) {
+      if (userInfoLoaded && userInfo && yards) {
         try {
           const [slotNotJoinedRes] = await Promise.all([
             getSlotNotJoined(idclubmem, id)
           ]);
-
           const slotNotJoinFitler = slotNotJoinedRes.result.filter((item) => {
               return (
                 item.memberPostId != idclubmem &&
@@ -71,7 +70,7 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
     };
 
     fetchData();
-  }, [userInfoLoaded, userInfo]);
+  }, [userInfoLoaded, userInfo, yards]);
 
   function isPassTime(date, hour) {
       const time = date + "T" + hour + ":00";
@@ -147,7 +146,8 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
 
         const remainingSlots = parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0);
         const isFull = remainingSlots <= 0;
-        const yardDetails = yards.find((yard) => {
+
+        const yardDetails = yards && yards.find((yard) => {
           return yard.id === item.yardId;
         });
 
