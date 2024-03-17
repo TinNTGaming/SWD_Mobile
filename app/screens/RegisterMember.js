@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Button} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Button, Image} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { getAllBuildingId } from "../../services/userService";
 import { registerMember } from "../../services/memberService";
 import * as ImagePicker from 'expo-image-picker';
-import axios from '../../axios.js';
 
 const RegisterMember = ({navigation}) => {
   const imageFile = useRef(null);
@@ -36,9 +35,6 @@ const RegisterMember = ({navigation}) => {
 
 
   const handleOnChangeInput = (event, id) => {
-    if(id === 'image' && imageFile){
-        uploadCloudinary(imageFile.current?.files[0])
-    }
     setFormData({
         ...formData,
         [id]: event,
@@ -59,21 +55,25 @@ const RegisterMember = ({navigation}) => {
 
   const uploadCloudinary = async (image) => {
     const formDataImage = new FormData();
-    formDataImage.append('api_key', '665652388645534');
-    formDataImage.append('upload_preset','upload-image');
-    formDataImage.append('file', image);
+    formDataImage.append("api_key", "665652388645534");
+    formDataImage.append("upload_preset", "upload-image");
+    formDataImage.append("file", {
+                                   uri: image,
+                                   type: 'image/*', // thay đổi kiểu MIME tùy thuộc vào loại file
+                                   name: 'upload.jpg'
+                                   });
     try {
-      const response = await axios.post('https://api.cloudinary.com/v1_1/upload-image/image/upload',formDataImage);
-      setTimeout(()=> {
-        setFormData({
-            ...formData,
-            image: response.data.url
-        })
-      },500)
-      console.log('Upload cloudinary successfully', response);
-    } catch (error) {
-      console.log('Error upload cloudinary:', error);
-    }
+        const response = await fetch('https://api.cloudinary.com/v1_1/upload-image/image/upload', {
+          method: 'POST',
+          body: formDataImage,
+        });
+        const data = await response.json();
+        console.log('Upload result: ', data.url);
+        return data.url;
+      } catch (error) {
+        console.error('Error uploading image to Cloudinary:', error);
+        throw error;
+      }
   };
 
   const checkValidateInput = () => {
@@ -94,6 +94,7 @@ const RegisterMember = ({navigation}) => {
     if (isValid) {
         console.log(formData);        
         try {
+          await uploadCloudinary(formData.image);
           await registerMember(formData)
           alert('Đăng kí thành công!');
           navigation.navigate('LoginMember');
@@ -116,25 +117,35 @@ const RegisterMember = ({navigation}) => {
     };
   
   const handleImagePicker = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    try {
+        // Yêu cầu quyền truy cập thư viện ảnh
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Permission to access media library was denied');
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          quality: 1,
+        });
 
-    console.log(result);
+        console.log(result);
 
-    if (!result.cancelled) {
-      handleOnChangeInput(result.assets.uri, 'image');
+        if (!result.cancelled) {
+          handleOnChangeInput(result.assets[0].uri, "image");
+        }
+    } catch (error) {
+        console.error('Error choosing/uploading image:', error);
+        // Xử lý lỗi nếu có
     }
   };
   
   return (
     <View style={styles.loginBackground}>
+    <Image style={styles.background} source={require('../assets/Sport/login-background.jpg')}/>
         <View style={styles.loginContainer}>
+        <ScrollView>
             <View style={styles.loginContent}>
-            <ScrollView>
             <Text style={styles.textLogin}>Tạo tài khoản</Text>
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Tên User:</Text>
@@ -166,6 +177,7 @@ const RegisterMember = ({navigation}) => {
             </View>                    
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Giới tính:</Text>
+                <View style={styles.inputPicker}>
                 <Picker
                     selectedValue={formData.gender}
                     onValueChange={(event) => handleOnChangeInput(event, 'gender')}
@@ -175,9 +187,11 @@ const RegisterMember = ({navigation}) => {
                     <Picker.Item label='Nữ' value='female' />
                     <Picker.Item label='Khác' value='other' />
                 </Picker>
+                </View>
             </View>    
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Tên tòa nhà:</Text>
+                <View style={styles.inputPicker}>
                 <Picker 
                     selectedValue={formData.buildingname}
                     onValueChange={(event) => handleBuildingNameChange (event)}
@@ -187,6 +201,7 @@ const RegisterMember = ({navigation}) => {
                       <Picker.Item key={buildingId.id} label={buildingId.name} value={buildingId.name} />
                     ))}
                 </Picker>
+                </View>
             </View>
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Số điện thoại:</Text>
@@ -200,9 +215,8 @@ const RegisterMember = ({navigation}) => {
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Ảnh</Text>
                 <Button title="Chọn ảnh" onPress={handleImagePicker} />
-                {formData.image && <Image source={formData.image} style={styles.image} />}
+                {formData.image && <Image source={{ uri: formData.image}} style={styles.image} />}
             </View>
-                
             <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.btnLogin} onPress={handleAddNewUser}>
                 <Text style={styles.btnText}>Đăng kí</Text>
@@ -211,8 +225,8 @@ const RegisterMember = ({navigation}) => {
                 <Text style={styles.btnText}>Đóng</Text>
                 </TouchableOpacity>
             </View>
-            </ScrollView>
             </View>
+            </ScrollView>
         </View>
     </View>
   );
@@ -223,16 +237,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
-    backgroundColor: 'rgba(34, 193, 195, 1)',
+    marginTop: 20,
   },
   loginContainer: {
-    width: 400,
+    width: '95%',
     borderRadius: 10,
     borderWidth: 1,
-    borderStyle: 'dashed',
+    borderStyle: 'solid',
     backgroundColor: 'white',
-    position: 'absolute',
     shadowColor: '#000',
     shadowOffset: {
       width: 5,
@@ -259,15 +271,20 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: 'bold',
-    fontSize: 17
+    fontSize: 17,
   },
   input: {
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    padding: 5,
+    borderWidth: 0.8,
+    borderStyle: 'solid',
+    padding: 10,
     marginBottom: 5,
   },
+  inputPicker:{
+    borderWidth: 0.8,
+    borderStyle: 'solid',
+  },
   buttonContainer: {
+    flex: 1,
     paddingTop: 30,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -277,8 +294,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     padding: 10,
     borderRadius: 15,
-    borderWidth: 1,
-    borderStyle: 'dashed',
+    borderWidth: 0.8,
+    borderStyle: 'solid',
     backgroundColor: 'rgba(34, 193, 195, 1)',
   },
   btnText: {
@@ -286,9 +303,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   image: {
-    width: 200,
+    width: '100%',
     height: 200,
-    borderRadius: 100,
+    resizeMode: 'contain',
+    marginTop: 10,
+  },
+  background: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+      padding: 0,
+      borderWidth: 1,
+      borderColor: '#000',
+      position: 'absolute',
   },
 });
 

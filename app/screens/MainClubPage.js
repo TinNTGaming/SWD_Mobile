@@ -74,7 +74,7 @@ const MainClubPage = () => {
       };
       fetchWalletData();
     }
-    }, [userInfoLoaded]);
+    }, [userInfoLoaded, userInfo]);
     //console.log(tranPoint);
   const handleTabClick = (tab) => {
     setActiveTab(tab);

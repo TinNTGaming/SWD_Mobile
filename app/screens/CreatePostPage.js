@@ -12,9 +12,7 @@ import {
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from 'expo-image-picker';
-import { Cloudinary } from 'cloudinary-core';
 
-import axios from "axios";
 import { getYardsBySport, createPostInSlot } from "../../services/userService";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -224,6 +222,7 @@ function CreatePostPage() {
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faClock} /> Thời gian bắt đầu
           </Text>
+          <View style={styles.inputPicker}>
           <Picker
             selectedValue={formData.startTime}
             onValueChange={(value) => handleOnChangeInput(value, "startTime")}
@@ -234,11 +233,13 @@ function CreatePostPage() {
               <Picker.Item key={index} label={hour} value={hour} />
             ))}
           </Picker>
+          </View>
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faClock} /> Thời gian kết thúc
           </Text>
+          <View style={styles.inputPicker}>
           <Picker
             selectedValue={formData.endTime}
             onValueChange={(value) => handleOnChangeInput(value, "endTime")}
@@ -251,6 +252,7 @@ function CreatePostPage() {
               <Picker.Item key={index} label={hour} value={hour} />
             ))}
           </Picker>
+          </View>
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>
@@ -278,12 +280,13 @@ function CreatePostPage() {
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faPersonShelter} /> Tên sân
           </Text>
+          <View style={styles.inputPicker}>
           <Picker
             selectedValue={formData.yardName}
             onValueChange={(value) => handleOnChangeInput(value, "yardName")}
             style={styles.input}
           >
-            <Picker.Item label="Chọn tên sân" value="" />
+            <Picker.Item label="Chọn tên sân" value=""/>
             {yards.map((yard) => (
               <Picker.Item
                 key={yard.id}
@@ -292,6 +295,7 @@ function CreatePostPage() {
               />
             ))}
           </Picker>
+          </View>
         </View>
 
         <View style={styles.formGroup}>
@@ -320,6 +324,7 @@ const styles = StyleSheet.create({
   modalContainer: {
       flex: 1,
       padding: 20,
+      paddingTop: 30,
       backgroundColor: "#fff",
     },
     modalHeader: {
@@ -354,13 +359,6 @@ const styles = StyleSheet.create({
       textAlignVertical: "top",
       fontSize: 16
     },
-    fileInput: {
-      height: 40,
-      borderColor: "gray",
-      borderWidth: 1,
-      borderRadius: 5,
-      paddingHorizontal: 10,
-    },
     modalFooter: {
       flexDirection: "row",
       justifyContent: "space-between",
@@ -382,6 +380,14 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         marginTop: 10,
     },
+    inputPicker:{
+        borderWidth: 0.8,
+        borderStyle: 'solid',
+        borderRadius: 5,
+        borderColor: "gray",
+        height: 40,
+        justifyContent: 'center'
+    }
   });
 
 export default CreatePostPage;

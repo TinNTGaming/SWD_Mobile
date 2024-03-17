@@ -60,11 +60,10 @@ function HistoryPage() {
       <Text style={styles.pageTitle}>Chi tiết về ví của bạn</Text>
       <View style={styles.historyWrapper}>
         <View style={styles.walletDetailPopup}>
-          <Text style={styles.detailTitle}>Ví của bạn</Text>
-          <Text>
+          <Text style={{fontSize: 17}}>
             <Text style={styles.boldText}>Tên:</Text> {walletInfo.memberName}
           </Text>
-          <Text>
+          <Text style={{fontSize: 17}}>
             <Text style={styles.boldText}>Điểm bạn đang có:</Text>{" "}
             {walletInfo.point}{" "}
             <FontAwesomeIcon icon={faStar} style={styles.faStar} />
@@ -115,8 +114,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   pageTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    marginLeft: "15%",
+    height: 51,
+    position: "relative",
+    backgroundColor: "#e8eee7",
+    borderRadius: 5,
+    width: "70%",
+    color: "black",
+    fontWeight: "700",
+    fontSize: 24,
+    marginBottom: 15,
+    textAlign:'center',
+    padding: 8
   },
   historyWrapper: {
     flex: 1,
@@ -132,6 +141,7 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: "bold",
+    fontSize: 17
   },
   faStar: {
     color: "gold",

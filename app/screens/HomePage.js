@@ -4,14 +4,14 @@ import { View, Text, StyleSheet, Image, TouchableOpacity} from 'react-native';
 const HomePage = ({ navigation }) => {
     return (
         <View style={styles.container}>
-            <Image style={styles.background} source={require('../assets/Sport/login-background.png')}/>
+            <Image style={styles.background} source={require('../assets/Sport/login-background.jpg')}/>
             <Text style={styles.title}>Welcome to Sports Club</Text>
             <View style={styles.loginBtnContainer}>
                 <TouchableOpacity
                     style={styles.loginBtn}
                     onPress={() => navigation.navigate('LoginMember')}
                 >
-                    <Text style={styles.loginText}>Login Member</Text>
+                    <Text style={styles.loginText}>Đăng nhập Member</Text>
                 </TouchableOpacity>
             </View>
             <Image source={require('../assets/others/welcome.jpg')} style={styles.wcImg} />
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 35,
-        color: '#fff',
+        color: 'black',
         fontWeight: 'bold'
     },
     loginBtnContainer: {
@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#E4AEC5',
         borderWidth: 1,
         borderColor: 'rgb(251, 95, 95)',
+        elevation: 5,
     },
     loginText: {
         color: '#000',

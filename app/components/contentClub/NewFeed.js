@@ -8,6 +8,7 @@ import {
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CountdownTimer from '../CountdownTime';
+import Avatar from "../../assets/avatar/no-avatar.png";
 
 function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
   const route = useRoute();
@@ -38,7 +39,7 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (userInfoLoaded && userInfo && yards) {
+      if (userInfoLoaded && userInfo) {
         try {
           const [slotNotJoinedRes] = await Promise.all([
             getSlotNotJoined(idclubmem, id)
@@ -70,7 +71,7 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
     };
 
     fetchData();
-  }, [userInfoLoaded, userInfo, yards]);
+  }, [userInfoLoaded, userInfo]);
 
   function isPassTime(date, hour) {
       const time = date + "T" + hour + ":00";
@@ -115,18 +116,37 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
     setSelectedImage(null);
   };
 
+  const isValidUri = (uri) => {
+       try {
+         new URL(uri);
+         return true;
+       } catch (error) {
+         return false;
+       }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.clubTitle}>{clubDetail.name}</Text>
-
-        <TouchableOpacity style={styles.postContainer} onPress={() => navigation.navigate('CreatePostPage', { clubDetail, idclubmem })}>
-        <Image source={userInfo && userInfo.image ? { uri: userInfo.image } : null} style={styles.avatar} />
-        <Text style={styles.writeBtn}>
-          <Text>{userInfo ? userInfo.name : 'Guest'} ơi! </Text>
-          <Text style={{ marginLeft: 5 }}>Bạn đang muốn gì thế?</Text>
-        </Text>
+      <View style={styles.postTitle}>
+      <TouchableOpacity style={styles.postContainer} onPress={() => navigation.navigate('CreatePostPage', { clubDetail, idclubmem })}>
+          {userInfo && userInfo.image && typeof userInfo.image === 'string' && isValidUri(userInfo.image) ?
+            <Image
+              source={{ uri: userInfo.image }}
+              style={styles.avatar}
+            />
+            :
+            <Image
+              source={Avatar}
+              style={styles.avatar}
+            />
+          }
+          <Text style={styles.writeBtn}>
+            <Text>{userInfo ? userInfo.name : 'Guest'} ơi! </Text>
+            <Text>Bạn đang muốn gì thế?</Text>
+          </Text>
       </TouchableOpacity>
-
+      </View>
       <Text style={styles.sectionTitle}>Bài viết mới nhất</Text>
       <ScrollView>
       {isLoading && <ActivityIndicator style={styles.loadingIcon} size="large" color="#0000ff" />}
@@ -147,9 +167,12 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
         const remainingSlots = parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0);
         const isFull = remainingSlots <= 0;
 
-        const yardDetails = yards && yards.find((yard) => {
-          return yard.id === item.yardId;
-        });
+        const yardDetails = null;
+        if(!yards)
+            yardDetails = yards && yards.find((yard) => {
+              return yard.id === item.yardId;
+            });
+
 
         return (
           <View key={item.id} style={styles.mainPostContainer}>
@@ -212,15 +235,8 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         textAlign: 'center'
     },
-    clubTitleNewFeed: {
-        marginLeft: "15%",
-        height: 44,
-        position: "absolute",
-        backgroundColor: "#a4ce9f",
-        padding: "5px 40px",
-        borderRadius: 5,
-        width: "70%",
-        color: "#fff",
+    postTitle:{
+        alignItems: 'center'
     },
     postContainer: {
         flexDirection: "row",
@@ -228,12 +244,13 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     avatar: {
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         borderRadius: 25,
     },
     writeBtn: {
-        marginLeft: 10,
+        textAlign: 'center',
+        fontSize: 15,
     },
     sectionTitle: {
         fontSize: 20,
