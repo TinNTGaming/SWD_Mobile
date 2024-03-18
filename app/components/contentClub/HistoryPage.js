@@ -110,7 +110,8 @@ function HistoryPage() {
 const styles = StyleSheet.create({
   historyPageContainer: {
     flex: 1,
-    padding: 20,
+    paddingTop: 20,
+    padding: 10,
     backgroundColor: "#fff",
   },
   pageTitle: {
@@ -165,6 +166,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderColor: '#000',
+    alignItems: 'center'
   },
   headerCell: {
     flex: 1,

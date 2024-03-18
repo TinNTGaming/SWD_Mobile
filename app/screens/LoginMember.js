@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     width: '97%',
-    height: '47%',
+    height: 400,
     borderRadius: 10,
     borderWidth: 1,
     borderStyle: 'solid',
