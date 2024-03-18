@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     padding: 10,
     marginBottom: 10,
+    borderRadius: 5,
   },
   buttonContainer: {
     flexDirection: 'row',

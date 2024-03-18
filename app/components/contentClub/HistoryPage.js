@@ -84,13 +84,22 @@ function HistoryPage() {
                     const resultPoint = item.initialPoint + item.transactionPoint;
                     const formattedTransactionPoint =
                       item.transactionPoint > 0 ? `+${item.transactionPoint}` : item.transactionPoint;
+                    let descriptionText = '';
 
+                    // Kiểm tra giá trị của description và đặt văn bản phù hợp
+                    if (item.desciption === 'join slot ') {
+                      descriptionText = 'Đăng kí      tham gia';
+                    } else if (item.desciption === 'confirm_joined') {
+                      descriptionText = 'Xác nhận   tham gia';
+                    } else {
+                      descriptionText = item.desciption;
+                    }
                     return (
                       <View style={styles.row} key={index}>
                         <Text style={styles.cell}>{item.initialPoint}</Text>
                         <Text style={styles.cell}>{formattedTransactionPoint}</Text>
                         <Text style={styles.cell}>{resultPoint}</Text>
-                        <Text style={styles.cell}>{item.desciption}</Text>
+                        <Text style={styles.cell}>{descriptionText}</Text>
                       </View>
                     );
                   })}

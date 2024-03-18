@@ -94,8 +94,12 @@ const RegisterMember = ({navigation}) => {
     if (isValid) {
         console.log(formData);        
         try {
-          await uploadCloudinary(formData.image);
-          await registerMember(formData)
+          const imageUrl = await uploadCloudinary(formData.image); // Đợi cho việc upload ảnh hoàn thành trước khi tiếp tục
+          setFormData(prevState => ({
+            ...prevState,
+            image: imageUrl, // Cập nhật URL ảnh sau khi upload thành công
+          }));
+          await registerMember(formData);
           alert('Đăng kí thành công!');
           navigation.navigate('LoginMember');
         } catch (error) {
@@ -192,9 +196,10 @@ const RegisterMember = ({navigation}) => {
             <View style={styles.loginInput}>
                 <Text style={styles.label}>Tên tòa nhà:</Text>
                 <View style={styles.inputPicker}>
-                <Picker 
-                    selectedValue={formData.buildingname}
-                    onValueChange={(event) => handleBuildingNameChange (event)}
+                <Picker
+                    onValueChange={(value) => handleBuildingNameChange (value)}
+                    selectedValue={formData.buildingName}
+                    style={styles.loginInput}
                 >
                     <Picker.Item label='Chọn tên tòa nhà' value='' />
                     {buildingIds.map((buildingId) => (
@@ -274,14 +279,22 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   input: {
-    borderWidth: 0.8,
+    height: 40,
+    borderWidth: 1,
     borderStyle: 'solid',
-    padding: 10,
+    paddingHorizontal: 10,
     marginBottom: 5,
+    fontSize: 16,
+    borderRadius: 5,
   },
   inputPicker:{
     borderWidth: 0.8,
     borderStyle: 'solid',
+
+    height: 40,
+    justifyContent: 'center',
+    fontSize: 16,
+    borderRadius: 5,
   },
   buttonContainer: {
     flex: 1,
