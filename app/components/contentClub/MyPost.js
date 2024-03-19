@@ -270,7 +270,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                         ) {
                                           return (
                                             <TouchableOpacity style={ styles.btnConfirm }>
-                                                <Text key={`${member.id}-confirm-joined`} style={styles.confirmText}>Đã tham gia</Text>
+                                                <Text style={styles.confirmText}>Đã tham gia</Text>
                                             </TouchableOpacity>
                                           );
                                         } else if (
@@ -279,7 +279,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                         ) {
                                           return (
                                           <TouchableOpacity style={ styles.btnCancel }>
-                                            <Text key={`${member.id}-confirm-no-joined`} style={styles.cancelText}>Không tham gia</Text>
+                                            <Text style={styles.cancelText}>Không tham gia</Text>
                                           </TouchableOpacity>
                                           );
                                         }
