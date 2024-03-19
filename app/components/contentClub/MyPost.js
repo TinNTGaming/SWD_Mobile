@@ -185,7 +185,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
               <View key={item.id} style={styles.mainPostContainer}>
                 <View style={styles.posterName}>
                   <View>
-                    <Text>{item.memberPostName}</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 18}}>{item.memberPostName}</Text>
                     <Text>{timePost}</Text>
                   </View>
                   {!isPassTime ? (
@@ -209,7 +209,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                     <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
                     <View>
                       <Text>Khu: <Text style={styles.boldText}>{yardDetails?.areaName}</Text></Text>
-                      <Text>Sân: <Text style={styles.boldText}>{yardDetails?.sportName} - {item.yardName}</Text></Text>
+                      <Text>Sân: <Text style={styles.boldText}>{yardDetails?.areaName} - {item.yardName}</Text></Text>
                       <Text>Thời gian: <Text style={styles.boldText}>{item.startTime} - {item.endTime}</Text></Text>
                       <Text>Date: <Text style={styles.boldText}>{item.date}</Text></Text>
                       <View>
@@ -235,8 +235,8 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                             {postItem.members.length > 0 ? (
                               postItem.members.map((member) => (
                                 <View key={member.id} style={styles.memberItem}>
-                                  <Text>{member.memberName}</Text>
-                                  <View>
+                                  <Text style={styles.item}>{member.memberName}</Text>
+                                  <View style={styles.item}>
                                     {isPassTime && postItem.status.map((status) => {
                                       if (status.clubMemberId === member.id) {
                                         if (status.joinStatus === "joined") {
@@ -251,7 +251,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                                   )
                                                 }
                                               >
-                                                <Text style={styles.confirmButton}>Xác nhận đã tham gia</Text>
+                                                <Text style={styles.confirmButton}>Đã tham gia</Text>
                                               </TouchableOpacity>
                                               <TouchableOpacity
                                                 onPress={() =>
@@ -261,7 +261,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                                   )
                                                 }
                                               >
-                                                <Text style={styles.cancelButton}>Xác nhận không tham gia</Text>
+                                                <Text style={styles.cancelButton}>Không tham gia</Text>
                                               </TouchableOpacity>
                                             </View>
                                           );
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
       marginBottom: 8,
   },
   caption: {
-    fontSize: 20,
+    fontSize: 17,
     marginBottom: 8,
   },
   postContentContainer: {
@@ -378,6 +378,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   confirmButtons:{
+
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
@@ -410,6 +411,7 @@ const styles = StyleSheet.create({
   },
   confirmText: {
     color: 'white',
+    fontWeight:'bold'
   },
   btnCancel: {
     backgroundColor: "#f44336",
@@ -421,6 +423,7 @@ const styles = StyleSheet.create({
   },
   cancelText: {
     color: 'white',
+    fontWeight:'bold'
   },
   memberJoin: {
     marginTop: 30,
@@ -433,6 +436,11 @@ const styles = StyleSheet.create({
   memberItem: {
     display: "flex",
     marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  item: {
+    paddingLeft: 10
   },
   noPostsMessage: {
     fontSize: 18

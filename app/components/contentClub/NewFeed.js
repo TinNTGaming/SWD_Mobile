@@ -167,8 +167,8 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
         const remainingSlots = parseInt(item.requiredMember) - parseInt(numberOfSlot[item.id] || 0);
         const isFull = remainingSlots <= 0;
 
-        const yardDetails = null;
-        if(!yards)
+        let yardDetails = [];
+        if(yards)
             yardDetails = yards && yards.find((yard) => {
               return yard.id === item.yardId;
             });
@@ -178,7 +178,7 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
           <View key={item.id} style={styles.mainPostContainer}>
             <View style={styles.posterName}>
                 <View>
-                  <Text>{item.memberPostName}</Text>
+                  <Text style={{fontWeight: 'bold', fontSize: 18}}>{item.memberPostName}</Text>
                   <Text>{timePost}</Text>
                 </View>
                 <View>
@@ -193,7 +193,7 @@ function NewFeed({ inforWallet, tranPoint, yards, setActiveTab, clubDetail }) {
               <View style={styles.postInfo}>
                 <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
                 <Text>Khu: <Text style={styles.boldText}>{yardDetails?.areaName}</Text></Text>
-                <Text>Sân: <Text style={styles.boldText}>{yardDetails?.sportName} - {item.yardName}</Text></Text>
+                <Text>Sân: <Text style={styles.boldText}>{yardDetails?.areaName} - {item.yardName}</Text></Text>
                 <Text>Thời gian: <Text style={styles.boldText}>{item.startTime} - {item.endTime}</Text></Text>
                 <Text>Date: <Text style={styles.boldText}>{item.date}</Text></Text>
                 <Text>Tổng số người chơi: <Text style={styles.boldText}>{parseInt(item.requiredMember) + parseInt(item.currentMember)}</Text></Text>
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     },
     caption: {
         marginBottom: 8,
-        fontSize: 20
+        fontSize: 17
     },
     postContentContainer: {
         flexDirection: "row",

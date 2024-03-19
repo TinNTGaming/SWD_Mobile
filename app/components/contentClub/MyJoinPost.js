@@ -137,7 +137,7 @@ function MyJoinPost({ yards }) {
             <View key={index} style={styles.mainPostContainer}>
               <View style={styles.posterName}>
                 <View>
-                  <Text>{resultItem.memberPostName}</Text>
+                  <Text style={{fontWeight: 'bold', fontSize: 18}}>{resultItem.memberPostName}</Text>
                   <Text>{timePost}</Text>
                 </View>
                 <View>
@@ -158,7 +158,7 @@ function MyJoinPost({ yards }) {
                     <Text>
                       Sân:{" "}
                       <Text style={styles.boldText}>
-                        {yardDetails?.sportName} - {resultItem.yardName}
+                        {yardDetails?.areaName} - {resultItem.yardName}
                       </Text>
                     </Text>
                     <Text>
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   caption: {
-    fontSize: 20,
+    fontSize: 17,
     marginBottom: 8,
   },
   postContentContainer: {
