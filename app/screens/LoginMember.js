@@ -27,7 +27,6 @@ const LoginMember = ({navigation}) => {
           navigation.navigate('MemberPage');
       }
     } catch (error) {
-      console.error(error);
       alert('Đăng nhập thất bại, hãy thử lại');
     }
   };
