@@ -6,6 +6,7 @@ import ClubContent from './contentMember/ClubContent';
 import Contact from '../components/FooterMember';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from "@react-navigation/native";
+import Avatar from "../assets/avatar/no-avatar.png";
 
 function HeaderMember() {
 
@@ -40,6 +41,15 @@ function HeaderMember() {
          }
    };
 
+   const isValidUri = (uri) => {
+     try {
+       new URL(uri);
+       return true;
+     } catch (error) {
+       return false;
+     }
+   };
+
   getLoginInfo();
 
   return (
@@ -53,7 +63,7 @@ function HeaderMember() {
               onPress={() => handleTabClick('home')}
             >
               <Text style={styles.active}>
-                <Text style={{ fontWeight: 'bold' }}>Home</Text>
+                <Text style={styles.text}>Trang chủ</Text>
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -61,7 +71,7 @@ function HeaderMember() {
               onPress={() => handleTabClick('club')}
             >
               <Text style={styles.active}>
-                <Text style={{ fontWeight: 'bold' }}>Club</Text>
+                <Text style={styles.text}>Câu lạc bộ</Text>
               </Text>
             </TouchableOpacity>
             <View style={styles.childContent}>
@@ -70,7 +80,7 @@ function HeaderMember() {
                 onPress={() => handleTabClick('contact')}
               >
                 <Text style={styles.active}>
-                  <Text style={{ fontWeight: 'bold' }}>Contact</Text>
+                  <Text style={styles.text}>Hướng dẫn</Text>
                 </Text>
               </TouchableOpacity>
             </View>
@@ -79,15 +89,17 @@ function HeaderMember() {
         <View style={styles.contentRight}>
         <TouchableOpacity onPress={() => setShowDropdown(!showDropdown)}>
           <View style={styles.headerUserInfo}>
-            <Text style={{ fontSize: 13, fontWeight: '300', textTransform: 'uppercase' }}>
-              {userInfo.name}
-            </Text>
+            <Image
+              source={userInfo.image && typeof userInfo.image === 'string' && isValidUri(userInfo.image) ? { uri: userInfo.image } : Avatar}
+              style={styles.headerImage}
+            />
           </View>
           </TouchableOpacity>
         </View>
       </View>
       {showDropdown && (
               <View style={styles.dropdown}>
+                <Text style={styles.headerUserInfo}>{userInfo.name}</Text>
                 <TouchableOpacity onPress={handleLogout}>
                   <Text style={styles.logoutText}>Đăng xuất</Text>
                 </TouchableOpacity>
@@ -104,12 +116,12 @@ function HeaderMember() {
 };
 const styles = StyleSheet.create({
     container: {
-    flex: 1,
-    flexDirection: 'column',
+      flex: 1,
+      flexDirection: 'column',
     },
     header: {
       flexDirection: 'row',
-      height: 70,
+      height: 80,
       position: 'absolute',
       top: 0,
       left: 0,
@@ -117,16 +129,17 @@ const styles = StyleSheet.create({
       zIndex: 1000,
       backgroundColor: '#fff',
       alignItems: 'center',
+      borderBottomWidth: 1,
+      borderBottomColor: "black",
       paddingTop: 30,
     },
     headerLogo: {
       height: '50%',
-      width: '20%',
+      width: '16%',
       resizeMode: 'cover',
     },
     middle: {
       flex: 1,
-      marginLeft: 10,
     },
     contentMiddle: {
       flexDirection: 'row',
@@ -138,45 +151,48 @@ const styles = StyleSheet.create({
     },
     active: {
       color: '#5cbb50',
-      fontSize: 18,
     },
     contentRight: {
-      marginLeft: 20,
+      marginLeft: 10,
       marginRight: 10,
       flexDirection: 'row',
       alignItems: 'center',
     },
-    // headerImage: {
-    //   backgroundSize: 'cover',
-    //   width: 50,
-    //   height: 50,
-    //   borderRadius: 25,
-    //   overflow: 'hidden',
-    // },
+     headerImage: {
+       resizeMode: 'cover',
+       width: 30,
+       height: 30,
+       borderRadius: 25,
+       overflow: 'hidden',
+     },
     headerUserInfo: {
-      fontSize: 5,
-      fontWeight: '10',
+      fontSize: 20,
+      fontWeight: 'bold',
       textTransform: 'uppercase',
     },
     content:{
       flex: 1,
-      marginTop: 70
+      marginTop: 80
     },
 
     dropdown: {
         position: 'absolute',
         top: 70,
-        right: 10,
-        backgroundColor: '#fff',
+        right: 5,
+        backgroundColor: 'rgba(169,169,169, 0.9)',
         borderRadius: 5,
         padding: 10,
         zIndex: 1001,
       },
       logoutText: {
-        fontSize: 13,
-        fontWeight: '300',
+        fontSize: 18,
+        fontWeight: 'bold',
         textTransform: 'uppercase',
         color: 'red',
+      },
+      text:{
+        fontSize: 18,
+        fontWeight: "bold",
       }
   });
 export default HeaderMember;

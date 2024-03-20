@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity, Image} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faImages, faCalendarDays } from "@fortawesome/free-regular-svg-icons";
 import {
@@ -9,15 +9,17 @@ import {
   faPersonShelter,
   faSignsPost,
 } from "@fortawesome/free-solid-svg-icons";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Picker } from "@react-native-picker/picker";
-import axios from "axios";
+import * as ImagePicker from 'expo-image-picker';
+
 import { getYardsBySport, createPostInSlot } from "../../services/userService";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import moment from 'moment-timezone';
 
 
 function CreatePostPage() {
-  const imageFile = useRef(null);
   const navigation = useNavigation();
   const route = useRoute();
   const { clubDetail, idclubmem } = route.params;
@@ -56,6 +58,8 @@ function CreatePostPage() {
   const [yards, setYards] = useState([]);
   const [yardId, setYardId] = useState("");
 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
   useEffect(() => {
       const fetchYards = async () => {
       if (userInfoLoaded && userInfo) {
@@ -70,10 +74,7 @@ function CreatePostPage() {
     fetchYards();
   }, [clubDetail, userInfoLoaded, userInfo]);
 
-  const handleOnChangeInput = async (value, id) => {
-    if (id === "image" && imageFile) {
-      await uploadCloudinary(imageFile.current?.files[0]);
-    }
+  const handleOnChangeInput = (value, id) => {
     setFormData({
       ...formData,
       [id]: value,
@@ -84,44 +85,99 @@ function CreatePostPage() {
     }
   };
 
+  const handleImagePicker = async () => {
+    try {
+        // Yêu cầu quyền truy cập thư viện ảnh
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          console.log('Permission to access media library was denied');
+          return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+          allowsEditing: true,
+          quality: 1,
+        });
+
+        console.log(result);
+
+        if (!result.cancelled) {
+          handleOnChangeInput(result.assets[0].uri, "image");
+        }
+    } catch (error) {
+        console.error('Error choosing/uploading image:', error);
+        // Xử lý lỗi nếu có
+    }
+  };
+
   const uploadCloudinary = async (image) => {
     const formDataImage = new FormData();
     formDataImage.append("api_key", "665652388645534");
     formDataImage.append("upload_preset", "upload-image");
-    formDataImage.append("file", image);
+    formDataImage.append("file", {
+                                   uri: image,
+                                   type: 'image/*', // thay đổi kiểu MIME tùy thuộc vào loại file
+                                   name: 'upload.jpg'
+                                   });
     try {
-      const response = await axios.post(
-        "https://api.cloudinary.com/v1_1/upload-image/image/upload",
-        formDataImage
-      );
-      setFormData({
-        ...formData,
-        image: response.data.url,
-      });
-      console.log("Upload cloudinary successfully", response);
-    } catch (error) {
-      console.log("Error upload cloudinary:", error);
-    }
+        const response = await fetch('https://api.cloudinary.com/v1_1/upload-image/image/upload', {
+          method: 'POST',
+          body: formDataImage,
+        });
+        const data = await response.json();
+        console.log('Upload result: ', data.url);
+        return data.url;
+      } catch (error) {
+        console.error('Error uploading image to Cloudinary:', error);
+        throw error;
+      }
   };
 
   const handleAddNewPost = async () => {
-    const postData = {
-      ...formData,
-      yardId: yardId,
-    };
-    postData.memberPostName = userInfo.name;
-    postData.clubId = id;
-    postData.memberPostId = idclubmem;
-    try {
-      await createPostInSlot(postData);
-      alert("Create post successfully!");
+    const currentTime = new Date();
+    const selectedDate = new Date(`${formData.date}T${formData.startTime}`);
+    if (selectedDate > currentTime) {
+      let postData = {
+        ...formData,
+        yardId: yardId,
+      };
+      try{
+        const response = await uploadCloudinary(postData.image);
+        postData = {
+          ...postData,
+          image: response,
+        };
+        console.log('Test',response)
+      } catch (error) {
+          console.error("Error uploading image to Cloudinary:", error);
+          // Xử lý lỗi tải lên ảnh ở đây nếu cần
+      };
+      postData.memberPostName = userInfo.name;
+      postData.clubId = id;
+      postData.memberPostId = idclubmem;
+      createPostInSlot(postData);
+      alert("Đăng bài thành công!");
       navigation.navigate('MainClubPage', {id, idclubmem});
-    } catch (error) {
-      alert("Create post error!");
-      console.error("Error creating post:", error);
-      navigation.navigate('MainClubPage', {id, idclubmem});
+    } else {
+      alert("Lỗi không thể đăng bài trước thời gian hiện tại!");
     }
   };
+
+    const showDatePicker = () => {
+      setDatePickerVisibility(true);
+    };
+
+    const hideDatePicker = () => {
+      setDatePickerVisibility(false);
+    };
+
+    const handleConfirmDate = (date) => {
+      const localDate = moment.tz(date, 'Asia/Ho_Chi_Minh').format('YYYY-MM-DD');
+      setFormData({
+        ...formData,
+        date: localDate,
+      });
+      hideDatePicker();
+    };
 
   const hours = [];
   for (let i = 5; i <= 21; i++) {
@@ -152,16 +208,21 @@ function CreatePostPage() {
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faCalendarDays} /> Ngày
           </Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(value) => handleOnChangeInput(value, "date")}
-            value={formData.date}
+          <TouchableOpacity onPress={showDatePicker}>
+              <Text style={styles.input}>{formData.date}</Text>
+          </TouchableOpacity>
+          <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirmDate}
+              onCancel={hideDatePicker}
           />
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faClock} /> Thời gian bắt đầu
           </Text>
+          <View style={styles.inputPicker}>
           <Picker
             selectedValue={formData.startTime}
             onValueChange={(value) => handleOnChangeInput(value, "startTime")}
@@ -172,21 +233,26 @@ function CreatePostPage() {
               <Picker.Item key={index} label={hour} value={hour} />
             ))}
           </Picker>
+          </View>
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faClock} /> Thời gian kết thúc
           </Text>
+          <View style={styles.inputPicker}>
           <Picker
             selectedValue={formData.endTime}
             onValueChange={(value) => handleOnChangeInput(value, "endTime")}
             style={styles.input}
           >
             <Picker.Item label="Chọn thời gian kết thúc" value="" />
-            {hours.map((hour, index) => (
+            {hours
+            .filter((hour) => hour > formData.startTime) // Lọc các giờ lớn hơn formData.startTime
+            .map((hour, index) => (
               <Picker.Item key={index} label={hour} value={hour} />
             ))}
           </Picker>
+          </View>
         </View>
         <View style={styles.formGroup}>
           <Text style={styles.label}>
@@ -214,12 +280,13 @@ function CreatePostPage() {
           <Text style={styles.label}>
             <FontAwesomeIcon icon={faPersonShelter} /> Tên sân
           </Text>
+          <View style={styles.inputPicker}>
           <Picker
             selectedValue={formData.yardName}
             onValueChange={(value) => handleOnChangeInput(value, "yardName")}
             style={styles.input}
           >
-            <Picker.Item label="Chọn tên sân" value="" />
+            <Picker.Item label="Chọn tên sân" value=""/>
             {yards.map((yard) => (
               <Picker.Item
                 key={yard.id}
@@ -228,22 +295,26 @@ function CreatePostPage() {
               />
             ))}
           </Picker>
+          </View>
         </View>
 
         <View style={styles.formGroup}>
           <View>
-            <FontAwesomeIcon icon={faImages} style={{ fontSize: 30 }} />
-            <TextInput
-              style={styles.fileInput}
-              placeholder="Chọn ảnh"
-              onChangeText={(value) => handleOnChangeInput(value, "image")}
-            />
+            <Text style={styles.label}>
+              <FontAwesomeIcon icon={faImages} /> Ảnh
+            </Text>
+            <Button title="Chọn ảnh" onPress={handleImagePicker} />
+            {formData.image && <Image source={{ uri: formData.image }} style={styles.image} />}
           </View>
         </View>
       </ScrollView>
       <View style={styles.modalFooter}>
-        <Button title="Đăng bài" onPress={handleAddNewPost} />
-        <Button title="Hủy" onPress={() => navigation.navigate('MainClubPage', {id, idclubmem})}/>
+          <TouchableOpacity style={styles.button} onPress={handleAddNewPost}>
+            <Text style={styles.buttonText}>Đăng bài</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MainClubPage', {id, idclubmem})}>
+            <Text style={styles.buttonText}>Hủy</Text>
+          </TouchableOpacity>
       </View>
     </View>
   );
@@ -251,50 +322,72 @@ function CreatePostPage() {
 
 const styles = StyleSheet.create({
   modalContainer: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  modalHeader: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-  modalBody: {
-    flex: 1,
-  },
-  formGroup: {
-    marginVertical: 10,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  textArea: {
-    height: 80,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    textAlignVertical: "top",
-  },
-  fileInput: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-  },
-  modalFooter: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-});
+      flex: 1,
+      padding: 20,
+      paddingTop: 30,
+      backgroundColor: "#fff",
+    },
+    modalHeader: {
+      fontSize: 20,
+      fontWeight: "bold",
+    },
+    modalBody: {
+      flex: 1,
+    },
+    formGroup: {
+      marginVertical: 10,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    input: {
+      height: 40,
+      borderColor: "gray",
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      paddingTop: 8,
+      fontSize: 16
+    },
+    textArea: {
+      height: 60,
+      borderColor: "gray",
+      borderWidth: 1,
+      borderRadius: 5,
+      paddingHorizontal: 10,
+      textAlignVertical: "top",
+      fontSize: 16
+    },
+    modalFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    button: {
+        backgroundColor: "#4CAF50",
+        padding: 10,
+        borderRadius: 5,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    buttonText: {
+        color: "#fff",
+        fontWeight: "bold",
+    },
+    image: {
+        width: '100%',
+        height: 200,
+        resizeMode: 'contain',
+        marginTop: 10,
+    },
+    inputPicker:{
+        borderWidth: 0.8,
+        borderStyle: 'solid',
+        borderRadius: 5,
+        borderColor: "gray",
+        height: 40,
+        justifyContent: 'center'
+    }
+  });
 
 export default CreatePostPage;

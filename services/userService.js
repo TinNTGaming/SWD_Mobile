@@ -141,6 +141,10 @@ const getYardsBySport = (sportId) => {
   return axios.get(`api/yards/${sportId}/sport`);
 };
 
+const getSlotNotJoined = (clubMem, idClub) => {
+  return axios.get(`api/slots/${clubMem}/${idClub}/getSlotnotJoin`);
+};
+
 export {
   getAllMembers,
   handleLogOut,
@@ -175,5 +179,6 @@ export {
   getSlotPostJoined,
   getYardDetail,
   getYards,
-  getYardsBySport
+  getYardsBySport,
+  getSlotNotJoined
 };

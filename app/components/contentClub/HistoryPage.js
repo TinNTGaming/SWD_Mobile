@@ -42,14 +42,7 @@ function HistoryPage() {
         const lastTransaction = response2.result.find(
           (item) => item.status && item.status.data && item.status.data[0] === 1
         );
-        if (lastTransaction) {
-          const resultPoint =
-            lastTransaction.initialPoint + lastTransaction.transactionPoint;
-          setWalletInfo((prevWalletInfo) => ({
-            ...prevWalletInfo,
-            point: resultPoint,
-          }));
-        }
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching wallet info:", error);
@@ -67,11 +60,10 @@ function HistoryPage() {
       <Text style={styles.pageTitle}>Chi tiết về ví của bạn</Text>
       <View style={styles.historyWrapper}>
         <View style={styles.walletDetailPopup}>
-          <Text style={styles.detailTitle}>Ví của bạn</Text>
-          <Text>
+          <Text style={{fontSize: 17}}>
             <Text style={styles.boldText}>Tên:</Text> {walletInfo.memberName}
           </Text>
-          <Text>
+          <Text style={{fontSize: 17}}>
             <Text style={styles.boldText}>Điểm bạn đang có:</Text>{" "}
             {walletInfo.point}{" "}
             <FontAwesomeIcon icon={faStar} style={styles.faStar} />
@@ -92,13 +84,22 @@ function HistoryPage() {
                     const resultPoint = item.initialPoint + item.transactionPoint;
                     const formattedTransactionPoint =
                       item.transactionPoint > 0 ? `+${item.transactionPoint}` : item.transactionPoint;
+                    let descriptionText = '';
 
+                    // Kiểm tra giá trị của description và đặt văn bản phù hợp
+                    if (item.desciption === 'join slot ') {
+                      descriptionText = 'Đăng kí      tham gia';
+                    } else if (item.desciption === 'confirm_joined') {
+                      descriptionText = 'Xác nhận   tham gia';
+                    } else {
+                      descriptionText = item.desciption;
+                    }
                     return (
                       <View style={styles.row} key={index}>
                         <Text style={styles.cell}>{item.initialPoint}</Text>
                         <Text style={styles.cell}>{formattedTransactionPoint}</Text>
                         <Text style={styles.cell}>{resultPoint}</Text>
-                        <Text style={styles.cell}>{item.desciption}</Text>
+                        <Text style={styles.cell}>{descriptionText}</Text>
                       </View>
                     );
                   })}
@@ -118,12 +119,23 @@ function HistoryPage() {
 const styles = StyleSheet.create({
   historyPageContainer: {
     flex: 1,
-    padding: 20,
+    paddingTop: 20,
+    padding: 10,
     backgroundColor: "#fff",
   },
   pageTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
+    marginLeft: "15%",
+    height: 51,
+    position: "relative",
+    backgroundColor: "#e8eee7",
+    borderRadius: 5,
+    width: "70%",
+    color: "black",
+    fontWeight: "700",
+    fontSize: 24,
+    marginBottom: 15,
+    textAlign:'center',
+    padding: 8
   },
   historyWrapper: {
     flex: 1,
@@ -139,6 +151,7 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: "bold",
+    fontSize: 17
   },
   faStar: {
     color: "gold",
@@ -162,6 +175,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderColor: '#000',
+    alignItems: 'center'
   },
   headerCell: {
     flex: 1,

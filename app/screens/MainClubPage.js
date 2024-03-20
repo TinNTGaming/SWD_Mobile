@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, YellowBox } from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { faNewspaper, faEnvelope } from "@fortawesome/free-regular-svg-icons";
@@ -8,6 +8,7 @@ import {
   getTranPoint,
   getWalletByMemberId,
   getYards,
+  getDetailClub
 } from "../../services/userService";
 
 import NewFeed from "../components/contentClub/NewFeed";
@@ -17,12 +18,15 @@ import HistoryPage from "../components/contentClub/HistoryPage";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+console.disableYellowBox = true;
+
 const MainClubPage = () => {
   const [activeTab, setActiveTab] = useState('newFeed');
   const navigation = useNavigation();
   const route = useRoute();
   const id = route.params.id;
   const idclubmem = route.params.idclubmem;
+
   const [userInfoLoaded, setUserInfoLoaded] = useState(false);
       const [userInfo, setUserInfo] = useState(null);
       useEffect(() => {
@@ -40,9 +44,10 @@ const MainClubPage = () => {
         fetchData();
       }, []);
 
-  const [inforWallet, setInforWallet] = useState();
-    const [tranPoint, setTranPoint] = useState({});
-    const [yards, setYards] = useState([]);
+  const [inforWallet, setInforWallet] = useState({});
+  const [tranPoint, setTranPoint] = useState({});
+  const [yards, setYards] = useState({});
+  const [clubDetail, setClubDetail] = useState({});
 
 
   useEffect(() => {
@@ -50,23 +55,27 @@ const MainClubPage = () => {
       const fetchWalletData = async () => {
         try {
           // Sử dụng Promise.all để gửi các yêu cầu cùng một lúc
-          const [walletRes, tranPointRes, yardsRes] = await Promise.all([
+          const [walletRes, tranPointRes, yardsRes, clubDetailRes] = await Promise.all([
             getWalletByMemberId(userInfo.id),
             getTranPoint(),
             getYards(),
+            getDetailClub(id),
           ]);
 
           // Đặt thông tin ví, điểm giao dịch và các khu vực vào trạng thái
           setInforWallet(walletRes.result);
           setTranPoint(tranPointRes.result);
           setYards(yardsRes.result);
+          //console.log(clubDetailRes);
+          setClubDetail(clubDetailRes.result);
         } catch (error) {
           console.error("Error fetching wallet data:", error);
         }
       };
+      fetchWalletData();
     }
-    }, [userInfoLoaded]);
-
+    }, [userInfoLoaded, userInfo]);
+    //console.log(tranPoint);
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   };
@@ -74,17 +83,22 @@ const MainClubPage = () => {
   return (
     <View style={styles.mainClubContainer}>
       <View style={styles.sideBarMain}>
+
         <TouchableOpacity style={styles.tabBtn} onPress={() => navigation.navigate('MemberPage')}>
-          <FontAwesomeIcon icon={faHome} />
-          <Text>Home</Text>
+            <View>
+                <FontAwesomeIcon icon={faHome}/>
+            </View>
+            <Text style={styles.text}>Trang chủ</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.tabBtn, activeTab === "newFeed" && styles.activeTab]}
           onPress={() => handleTabClick("newFeed")}
         >
-          <FontAwesomeIcon icon={faNewspaper} />
-          <Text>New feed</Text>
+          <View style={styles.icon}>
+            <FontAwesomeIcon icon={faNewspaper} />
+          </View>
+          <Text style={styles.text}>Bảng tin</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -92,7 +106,7 @@ const MainClubPage = () => {
           onPress={() => handleTabClick("myPost")}
         >
           <FontAwesomeIcon icon={faEnvelope} />
-          <Text>My posted</Text>
+          <Text style={styles.text}>Bài đăng của tôi</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -100,7 +114,7 @@ const MainClubPage = () => {
           onPress={() => handleTabClick("myJoinPost")}
         >
           <FontAwesomeIcon icon={faEnvelope} />
-          <Text>Posts joined</Text>
+          <Text style={styles.text}>Bài đăng tham gia</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -108,11 +122,16 @@ const MainClubPage = () => {
           onPress={() => handleTabClick("myHistory")}
         >
           <FontAwesomeIcon icon={faEnvelope} />
-          <Text>History</Text>
+          <Text style={styles.text}>Ví</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.contentContainer}>
-        {activeTab === "newFeed" && <NewFeed />}
+        {activeTab === "newFeed" && <NewFeed
+                                    inforWallet={inforWallet}
+                                    tranPoint={tranPoint}
+                                    yards={yards}
+                                    setActiveTab={setActiveTab}
+                                    clubDetail={clubDetail}/>}
         {activeTab === "myPost" && <MyPost
                                    tranPoint={tranPoint}
                                    inforWallet={inforWallet}
@@ -142,13 +161,14 @@ const styles = StyleSheet.create({
     borderTopColor: "#e9e1e1",
   },
   tabBtn: {
+    flex:1,
     width: "20%",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    fontWeight: "bold",
-    textAlign: "center",
+    paddingVertical: 5,
+    paddingHorizontal: 5,
     borderBottomWidth: 1,
     borderBottomColor: "#e9e1e1",
+    justifyContent:'center',
+    alignItems:'center',
   },
   tabBtnText: {
     fontWeight: "bold",
@@ -160,6 +180,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  text:{
+    textAlign: 'center',
+    fontWeight: "bold",
+  }
 });
 
 export default MainClubPage;

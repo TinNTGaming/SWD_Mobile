@@ -56,26 +56,26 @@ const ClubPage = () => {
     });
 
     setIsJoined(true);
-    alert("Join Club Success");
+    alert("Tham gia thành công");
     setClubDetail((prevClubDetail) => ({
       ...prevClubDetail,
       countMember: prevClubDetail.countMember + 1,
     }));
 
-    // navigation.navigate("YourNextScreen"); // Replace with your desired navigation destination
+    navigation.navigate('MainClubPage', { id: clubDetail.id, idclubmem: memberCreatePostId })
   };
 
   const handleLeaveClub = async () => {
     Alert.alert(
-      "Confirm",
+      "Xác nhận",
       "Bạn có chắc chắn muốn rời club?",
       [
         {
-          text: "Cancel",
+          text: "Hủy",
           style: "cancel",
         },
         {
-          text: "OK",
+          text: "Đồng ý",
           onPress: async () => {
             await MemberLeavingClub({
               memberId: userInfo.id,
@@ -119,34 +119,39 @@ const ClubPage = () => {
   const timePost = `  ${day}-${month}-${year}`;
 
   return (
-    <View style={styles.containerClub}>      
+    <View style={styles.containerClub}>
       <View style={styles.clubHeader}>
-        <Image source={{ uri: clubDetail.image }} style={{ width: 200, height: 200 }} />
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <Image source={{ uri: clubDetail.image }} style={{ width: 200, height: 200 }} />
+        </View>
         <Text style={styles.clubHeaderText}>Câu Lạc Bộ {clubDetail.name}</Text>
-        <Text>{clubDetail.countMember} thành viên</Text>
-        <Text>Mô tả: {clubDetail.description}</Text>
-        <Text>Ngày thành lập: {timePost}</Text>
-        <Text>Người quản lí: {clubDetail.staffName}</Text>
-        
+        <Text style={{textAlign:'center'}}>{clubDetail.countMember} thành viên</Text>
+        <Text style={styles.infoText}>Mô tả: {clubDetail.description}</Text>
+        <Text style={styles.infoText}>Ngày thành lập: {timePost}</Text>
+        <Text style={styles.infoText}>Người quản lí: {clubDetail.staffName}</Text>
+
         {isJoined ? (
-          <View>
+          <View style={styles.button}>
             <TouchableOpacity onPress={() => navigation.navigate('MainClubPage', { id: clubDetail.id, idclubmem: memberCreatePostId })}>
               <Text style={styles.btn}>Tham quan</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLeaveClub}>
               <Text style={[styles.btn, styles.leaveBtn]}>Muốn rời nhóm</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}>
+              <Text style={styles.btn}>Quay Lại</Text>
+            </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity onPress={handleJoinClub}>
-            <Text style={styles.btn}>Tham gia</Text>
-          </TouchableOpacity>
+          <View style={styles.button}>
+            <TouchableOpacity onPress={handleJoinClub}>
+              <Text style={styles.btn}>Tham gia</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}>
+              <Text style={styles.btn}>Quay Lại</Text>
+            </TouchableOpacity>
+          </View>
         )}
-      </View>
-      <View style={styles.mainClub}>
-      <TouchableOpacity onPress={() => navigation.navigate('MemberPage')}> 
-        <Text style={styles.btn}>Quay Lại</Text>
-      </TouchableOpacity>
       </View>
     </View>
   );
@@ -156,13 +161,12 @@ const styles = StyleSheet.create({
   containerClub: {
     flex: 1,
     backgroundColor: '#FEF7F7',
-    padding: 10,
+    padding: 20,
   },
   clubHeader: {
     flex: 1,
     backgroundColor: '#FEF7F7',
     borderRadius: 20,
-    alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
@@ -170,6 +174,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     paddingTop: 20,
     margin: 0,
+    textAlign: 'center',
+  },
+  infoText:{
+    paddingTop: 5,
+    fontSize: 15,
+    textAlign: 'justify'
   },
   btn: {
     padding: 10,
@@ -186,6 +196,10 @@ const styles = StyleSheet.create({
   mainClub: {
     flex: 1,
     alignItems: 'center',
+  },
+  button:{
+    paddingTop: 20,
+    marginHorizontal: 100
   },
 });
 

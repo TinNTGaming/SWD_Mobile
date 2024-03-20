@@ -16,9 +16,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName='HomePage'>
-        <Stack.Screen name='HomePage' component={HomePage} />
-        <Stack.Screen name='LoginMember' component={LoginMember} />
-        <Stack.Screen name='RegisterMember' component={RegisterMember} />
+        <Stack.Screen name='HomePage' component={HomePage} options={{headerShown: false}}/>
+        <Stack.Screen name='LoginMember' component={LoginMember} options={{headerShown: false}}/>
+        <Stack.Screen name='RegisterMember' component={RegisterMember} options={{headerShown: false}}/>
         <Stack.Screen name='MemberPage' component={MemberPage} options={{headerShown: false}}/>
         <Stack.Screen name='ClubPage' component={ClubPage} options={{headerShown: false}}/>
         <Stack.Screen name='MainClubPage' component={MainClubPage} options={{headerShown: false}}/>

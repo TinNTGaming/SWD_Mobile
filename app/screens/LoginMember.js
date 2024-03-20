@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import _ from "lodash";
 import { handleLoginMember } from "../../services/memberService";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,18 +27,18 @@ const LoginMember = ({navigation}) => {
           navigation.navigate('MemberPage');
       }
     } catch (error) {
-      console.error(error);
       alert('Đăng nhập thất bại, hãy thử lại');
     }
   };
 
   return (
     <View style={styles.loginBackground}>
+    <Image style={styles.background} source={require('../assets/Sport/login-background.jpg')}/>
       <View style={styles.loginContainer}>
         <View style={styles.loginContent}>
           <Text style={styles.textLogin}>Đăng nhập thành viên</Text>
           <View style={styles.loginInput}>
-            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.label}>Tài khoản:</Text>
             <TextInput
               style={styles.input}
               placeholder='Nhận email của bạn'
@@ -62,6 +62,11 @@ const LoginMember = ({navigation}) => {
               <Text style={styles.btnText}>Tạo mới người dùng</Text>
             </TouchableOpacity>
           </View>
+          <View style={styles.closeBtn}>
+            <TouchableOpacity style={styles.btnLogin} onPress={() => navigation.navigate('HomePage')}>
+              <Text style={styles.btnText}>Đóng</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </View>
@@ -73,15 +78,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
-    backgroundColor: 'rgba(34, 193, 195, 1)',
+    paddingTop: 20
   },
   loginContainer: {
-    width: 400,
-    height: 350,
+    width: '97%',
+    height: 400,
     borderRadius: 10,
     borderWidth: 1,
-    borderStyle: 'dashed',
+    borderStyle: 'solid',
     backgroundColor: 'white',
     position: 'absolute',
     shadowColor: '#000',
@@ -114,13 +118,18 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderStyle: 'dashed',
+    borderStyle: 'solid',
     padding: 10,
     marginBottom: 10,
+    borderRadius: 5,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  closeBtn:{
+     alignSelf: 'center',
+     flexDirection: 'row',
   },
   btnLogin: {
     width: '48%',
@@ -128,12 +137,20 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 15,
     borderWidth: 1,
-    borderStyle: 'dashed',
+    borderStyle: 'solid',
     backgroundColor: 'rgba(34, 193, 195, 1)',
   },
   btnText: {
     color: 'white',
     textAlign: 'center',
+  },
+  background: {
+      flex: 1,
+      width: '100%',
+      height: '100%',
+      padding: 0,
+      borderWidth: 1,
+      borderColor: '#000',
   },
 });
 

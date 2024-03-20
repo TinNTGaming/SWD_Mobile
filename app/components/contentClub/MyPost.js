@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView } from "react-native";
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet, ScrollView, Modal ,YellowBox} from "react-native";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -16,6 +16,8 @@ import {
 import CountdownTimer from "../CountdownTime";
 import { useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+console.disableYellowBox = true;
 
 function MyPost({ tranPoint, inforWallet, yards }) {
   const route = useRoute();
@@ -106,10 +108,10 @@ function MyPost({ tranPoint, inforWallet, yards }) {
       const response3Results = await Promise.all(response3Promises);
       setMemberJoinList(response3Results);
 
-      showSuccessToast("Confirm successful!");
+      alert("Xác nhận thành công!");
     } catch (error) {
       console.log(error);
-      showErrorToast("Confirm failed!");
+      alert("Lỗi!");
     }
   };
 
@@ -127,15 +129,28 @@ function MyPost({ tranPoint, inforWallet, yards }) {
 
       const response3Results = await Promise.all(response3Promises);
       setMemberJoinList(response3Results);
-      showSuccessToast("Cancel successful!");
+      alert("Xác nhận không tham gia!");
     } catch (error) {
-      showErrorToast("Cancel failed!");
+      alert("Lỗi!");
     }
+  };
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const handleImagePress = (imageUri) => {
+      setSelectedImage(imageUri);
+      setIsModalVisible(true);
+  };
+
+  const closeModal = () => {
+      setIsModalVisible(false);
+      setSelectedImage(null);
   };
 
   return (
     <View style={styles.container}>
-      <Text>Bài viết của bạn</Text>
+      <Text style={styles.clubTitleNewFeed}>Bài viết của bạn</Text>
       <ScrollView>
       {isLoading && <ActivityIndicator style={styles.loadingIcon} size="large" color="#0000ff" />}
       {myPost.length === 0 ? (
@@ -170,23 +185,31 @@ function MyPost({ tranPoint, inforWallet, yards }) {
               <View key={item.id} style={styles.mainPostContainer}>
                 <View style={styles.posterName}>
                   <View>
-                    <Text>{item.memberPostName}</Text>
+                    <Text style={{fontWeight: 'bold', fontSize: 18}}>{item.memberPostName}</Text>
                     <Text>{timePost}</Text>
                   </View>
+                  {!isPassTime ? (
                   <View>
                     <CountdownTimer targetTime={time} />
                   </View>
+                  ) : (
+                  <View>
+                      <Text style={{fontSize: 16, fontWeight: "bold"}}>Kết thúc trận đấu</Text>
+                  </View>
+                  )}
                 </View>
 
                 <Text style={styles.caption}>{item.description}</Text>
 
                 <View style={styles.postContentContainer}>
-                  <Image style={styles.postImg} source={{ uri: item.image }} />
+                  <TouchableOpacity style={styles.postImg} onPress={() => handleImagePress(item.image)}>
+                    <Image style={styles.postImg} source={{ uri: item.image }} />
+                  </TouchableOpacity>
                   <View style={styles.postInfo}>
-                    <Text style={styles.infoText}>Thông tin trận đấu</Text>
+                    <Text style={styles.postInfoText}>Thông tin trận đấu</Text>
                     <View>
                       <Text>Khu: <Text style={styles.boldText}>{yardDetails?.areaName}</Text></Text>
-                      <Text>Sân: <Text style={styles.boldText}>{yardDetails?.sportName} - {item.yardName}</Text></Text>
+                      <Text>Sân: <Text style={styles.boldText}>{yardDetails?.areaName} - {item.yardName}</Text></Text>
                       <Text>Thời gian: <Text style={styles.boldText}>{item.startTime} - {item.endTime}</Text></Text>
                       <Text>Date: <Text style={styles.boldText}>{item.date}</Text></Text>
                       <View>
@@ -212,15 +235,14 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                             {postItem.members.length > 0 ? (
                               postItem.members.map((member) => (
                                 <View key={member.id} style={styles.memberItem}>
-                                  <Text>{member.memberName}</Text>
-                                  <View>
-                                    {postItem.status.map((status) => {
+                                  <Text style={styles.item}>{member.memberName}</Text>
+                                  <View style={styles.item}>
+                                    {isPassTime && postItem.status.map((status) => {
                                       if (status.clubMemberId === member.id) {
                                         if (status.joinStatus === "joined") {
                                           return (
                                             <View key={`${member.id}-joined`} style={styles.confirmButtons}>
                                               <TouchableOpacity
-                                                style={styles.confirmButton}
                                                 onPress={() =>
                                                   handleConfirmJoin(
                                                     member.id,
@@ -229,10 +251,9 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                                   )
                                                 }
                                               >
-                                                <Text style={styles.buttonText}>Xác nhận đã tham gia</Text>
+                                                <Text style={styles.confirmButton}>Đã tham gia</Text>
                                               </TouchableOpacity>
                                               <TouchableOpacity
-                                                style={styles.cancelButton}
                                                 onPress={() =>
                                                   handleCancelJoin(
                                                     member.id,
@@ -240,7 +261,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                                   )
                                                 }
                                               >
-                                                <Text style={styles.buttonText}>Xác nhận không tham gia</Text>
+                                                <Text style={styles.cancelButton}>Không tham gia</Text>
                                               </TouchableOpacity>
                                             </View>
                                           );
@@ -249,7 +270,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                         ) {
                                           return (
                                             <TouchableOpacity style={ styles.btnConfirm }>
-                                                <Text key={`${member.id}-confirm-joined`} style={styles.confirmText}>Đã tham gia</Text>
+                                                <Text style={styles.confirmText}>Đã tham gia</Text>
                                             </TouchableOpacity>
                                           );
                                         } else if (
@@ -258,7 +279,7 @@ function MyPost({ tranPoint, inforWallet, yards }) {
                                         ) {
                                           return (
                                           <TouchableOpacity style={ styles.btnCancel }>
-                                            <Text key={`${member.id}-confirm-no-joined`} style={styles.cancelText}>Không tham gia</Text>
+                                            <Text style={styles.cancelText}>Không tham gia</Text>
                                           </TouchableOpacity>
                                           );
                                         }
@@ -282,121 +303,70 @@ function MyPost({ tranPoint, inforWallet, yards }) {
         </>
       )}
       </ScrollView>
+      <Modal visible={isModalVisible} transparent={true} animationType="slide">
+        <View style={styles.modalContainer}>
+          <Image style={styles.modalImage} source={{ uri: selectedImage }} />
+          <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+              <Text style={styles.closeButtonText}>Đóng</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  newFeedContainer: {
-    width: "80%",
-    backgroundColor: "#fff",
+  container: {
+    flex: 1,
+    padding: 16,
   },
   clubTitleNewFeed: {
-    marginLeft: 60,
+    marginLeft: "15%",
     height: 51,
-    position: "fixed",
+    position: "relative",
     backgroundColor: "#e8eee7",
-    padding: "5px 40px",
     borderRadius: 5,
     width: "70%",
-    color: "#fff",
+    color: "black",
     fontWeight: "700",
     fontSize: 24,
-  },
-  postContainer: {
-    margin: "50px auto 20px",
-    height: 126,
-    width: "80%",
-    backgroundColor: "white",
-    borderRadius: 10,
-    textAlign: "center",
-    padding: "30px 0",
-    shadowColor: "#ccc",
-    shadowOffset: { width: 10, height: 10 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    display: "flex",
-    justifyContent: "center",
-  },
-  postInput: {
-    borderRadius: 20,
-    width: "80%",
-    height: 50,
-    padding: 10,
-    marginBottom: 20,
-    backgroundColor: "#d0cdcd",
-  },
-  postLine: {
-    width: "90%",
-    height: 2,
-    backgroundColor: "#d0cdcd",
-    margin: "0 auto",
-  },
-  h5: {
-    marginLeft: 60,
+    marginBottom: 15,
+    textAlign:'center',
+    padding: 8
   },
   mainPostContainer: {
-    height: "auto",
-    padding: 20,
-    width: "90%",
-    backgroundColor: "white",
-    margin: "50px auto",
-    borderRadius: 10,
-    shadowColor: "#ccc",
-    shadowOffset: { width: 5, height: 5 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
     borderWidth: 1,
     borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 16,
   },
   posterName: {
-    display: "flex",
-    justifyContent: "space-between",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    width: "100%",
-    padding: 10,
-    marginBottom: 10,
-  },
-  p: {
-    margin: 0,
-    fontWeight: "bold",
-    fontSize: 24,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 8,
   },
   caption: {
-    fontSize: 20,
-    marginBottom: 20,
-    marginLeft: 30,
+    fontSize: 17,
+    marginBottom: 8,
   },
   postContentContainer: {
-    marginLeft: 30,
     display: "flex",
+    flexDirection: "row",
+  },
+  postInfo: {
+    flex: 4,
   },
   postImg: {
-    width: "16%",
-    height: 50,
-    borderRadius: 25,
-    overflow: "hidden",
-    marginRight: 20,
+    flex: 3,
+    resizeMode: "contain",
+    borderRadius: 5,
+    marginRight: 10
   },
-  postInfor: {
-    paddingLeft: 50,
-    width: "auto",
-    textAlign: "left",
-    backgroundColor: "white",
-    marginLeft: 20,
-    borderWidth: 1,
-    borderColor: "#bebaba",
-    paddingBottom: 10,
-    display: "flex",
-    flexDirection: "column",
-  },
-  h3: {
-    marginBottom: 20,
-    fontWeight: "bold",
+  postInfoText: {
+      fontSize: 16,
+      fontWeight: "bold",
+      marginBottom: 8,
   },
   btnJoin: {
     padding: "10px 50px",
@@ -407,51 +377,53 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginTop: 20,
   },
-  b: {
-    fontSize: 24,
-    fontWeight: "400",
-  },
-  confirm: {
-    width: 50,
-    border: "none",
-    outline: "none",
-    backgroundColor: "transparent",
-    color: "orange",
-    fontSize: 18,
+  confirmButtons:{
+
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 10,
   },
   confirmButton: {
-    border: "none",
-    borderRadius: 4,
-    padding: "8px 16px",
-    marginRight: 8,
+    padding: 10,
+    margin: 5,
     backgroundColor: "#4caf50",
     color: "white",
+    borderRadius: 5,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   cancelButton: {
-    border: "none",
-    borderRadius: 4,
-    padding: "8px 16px",
-    marginRight: 8,
+    padding: 10,
+    margin: 5,
     backgroundColor: "#f44336",
     color: "white",
+    borderRadius: 5,
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   btnConfirm: {
-    backgroundColor: 'green',
-    width: 80,
-    paddingBottom: 5,
-    paddingTop: 5,
+    backgroundColor: "#4caf50",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
   },
   confirmText: {
     color: 'white',
+    fontWeight:'bold'
   },
   btnCancel: {
-    backgroundColor: 'red',
-    width: 100,
-    paddingBottom: 5,
-    paddingTop: 5,
+    backgroundColor: "#f44336",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
   },
   cancelText: {
     color: 'white',
+    fontWeight:'bold'
   },
   memberJoin: {
     marginTop: 30,
@@ -464,6 +436,40 @@ const styles = StyleSheet.create({
   memberItem: {
     display: "flex",
     marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  item: {
+    paddingLeft: 10
+  },
+  noPostsMessage: {
+    fontSize: 18
+  },
+  modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  modalImage: {
+      width: "80%",
+      height: "80%",
+      resizeMode: "contain",
+  },
+  closeButton: {
+      position: "absolute",
+      top: 20,
+      right: 20,
+      backgroundColor: "white",
+      padding: 10,
+      borderRadius: 5,
+  },
+  closeButtonText: {
+      color: "black",
+      fontWeight: "bold",
+  },
+  boldText:{
+      fontWeight: "bold",
   },
 });
 

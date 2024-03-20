@@ -3,7 +3,7 @@ import axios from 'axios';
 import _ from 'lodash';
 
 const instance = axios.create({
-  baseURL: 'http://26.246.163.25:3000',
+  baseURL: 'https://swd-be.onrender.com',
     // withCredentials: true
 });
 
@@ -15,12 +15,16 @@ instance.interceptors.response.use(
 )
 
 instance.interceptors.request.use(
-  (config) => {
-    const token = AsyncStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+  async (config) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    } catch (error) {
+      return Promise.reject(error);
     }
-    return config;
   },
   (error) => {
     return Promise.reject(error);

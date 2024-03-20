@@ -27,12 +27,12 @@ function ClubContent() {
   return (
     <View style={styles.containerClub1}>
       <View style={styles.line}></View>
-      <Text style={styles.clubTitle}>Sport clubs</Text>
+      <Text style={styles.clubTitle}>Các câu lạc bộ thể thao</Text>
       <ScrollView horizontal={false}>
       <View style={styles.contentMiddle}>            
         {clubs &&
           clubs.map((item, index) => {
-            if (item.status && item.status.data && item.status.data[0] === 1) {
+            if (item.status && item.status.data && item.status.data[0] === 1 && item.approveStatus === 1) {
               return (
                 <TouchableOpacity
                   key={index}
